@@ -5,8 +5,7 @@ from tqdm import tqdm
 import torch
 import json
 
-from utils import sample_excluding
-
+from src.data.utils import sample_excluding
 
 class Ex2VecOriginalDatasetShared:
     def __init__(self, data_path, usage_dict_path, timedeltas_list_path, history_size=3500, sample_negative=-1, max_padding=256, disable_tqdm=False):
@@ -40,7 +39,6 @@ class Ex2VecOriginalDatasetShared:
                     flat_index = user * (self.max_item + 1) + item
                     self.pos_array[flat_index] = i
 
-        s
 
     def __len__(self):
         return len(self.data)
@@ -95,7 +93,7 @@ class Ex2VecOriginalDatasetShared:
 GLOBAL_SHARED_DATA = {}
 
 
-class Ex2VecOriginalDatasetWrap(torch.utisl.data.Dataset):
+class Ex2VecOriginalDatasetWrap(torch.utils.data.Dataset):
     def __init__(self, dataset_id = 'default'):
         if dataset_id not in GLOBAL_SHARED_DATA:
             raise KeyError(f"Ex2VecOriginalDatasetShared group '{dataset_id}' not found in the GLOBAL_SHARED_DATA.")
