@@ -14,3 +14,7 @@ def get_model(name: str):
 
 def check_model(name: str):
     return name.lower() in MODEL_REGISTRY
+
+
+def get_available():
+    return list(MODEL_REGISTRY.keys())
