@@ -13,23 +13,24 @@ GROUP_TO_NAME = {}
 GLOBAL_SHARED_DATA = {}
 
 
-def init_dataset(dataset_name, group_id, config):
-    GROUP_TO_NAME[group_id] = dataset_name
-    GLOBAL_SHARED_DATA[group_id] = DATASET_INIT_REGISTRY[dataset_name](config)
+def init_dataset(group_id, config):
+    dataset_type = config['dataset_type']
+    GROUP_TO_NAME[group_id] = dataset_type
+    GLOBAL_SHARED_DATA[group_id] = DATASET_INIT_REGISTRY[dataset_type](config)
 
 
-def create_dataset(group_id):
+def get_dataset(group_id):
     if group_id not in GLOBAL_SHARED_DATA:
         raise KeyError(f'No dataset found in group {group_id} in the GLOBAL_SHARED_DATA. Please initialize a dataset '
                        f'for this group first.')
     return DATASET_INIT_REGISTRY[GROUP_TO_NAME[group_id]](GLOBAL_SHARED_DATA[group_id])
 
 
-def check_dataset(name: str):
-    return name.lower() in DATASET_INIT_REGISTRY
+def check_dataset(config):
+    return config['dataset_type'].lower() in DATASET_INIT_REGISTRY
 
 
-def get_available():
+def get_available_datasets():
     return list(DATASET_INIT_REGISTRY.keys())
 
 
