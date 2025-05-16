@@ -11,10 +11,10 @@ class Ex2VecOriginal(torch.nn.Module):
 
         self.global_lamb = torch.nn.Parameter(torch.tensor(1.0))
 
-        self.user_lamb = torch.nn.Embedding(self.n_user s +1, 1)
+        self.user_lamb = torch.nn.Embedding(self.n_users +1, 1)
 
-        self.user_bias = torch.nn.Embedding(self.n_user s +1, 1)
-        self.item_bias = torch.nn.Embedding(self.n_item s +1, 1)
+        self.user_bias = torch.nn.Embedding(self.n_users +1, 1)
+        self.item_bias = torch.nn.Embedding(self.n_items +1, 1)
 
         self.alpha = torch.nn.Parameter(torch.tensor(1.0))
         self.beta = torch.nn.Parameter(torch.tensor(-0.065))
