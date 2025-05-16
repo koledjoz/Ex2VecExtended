@@ -5,16 +5,16 @@ MODEL_REGISTRY = {
 }
 
 
-def get_model(name: str):
+def get_model(config):
     try:
-        return MODEL_REGISTRY[name.lower()]
+        return MODEL_REGISTRY[config['model_type'].lower()](config)
     except KeyError:
-        raise ValueError(f"Unknown model: {name}. Available models: {list(MODEL_REGISTRY.keys())}")
+        raise ValueError(f"Unknown model: {config['model_type']}. Available models: {list(MODEL_REGISTRY.keys())}")
 
 
-def check_model(name: str):
-    return name.lower() in MODEL_REGISTRY
+def check_model(config):
+    return config['model_type'].lower() in MODEL_REGISTRY
 
 
-def get_available():
+def get_available_models():
     return list(MODEL_REGISTRY.keys())
