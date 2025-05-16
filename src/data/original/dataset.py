@@ -7,13 +7,14 @@ import json
 
 from src.data.utils import sample_excluding
 
+
 class Ex2VecOriginalDatasetShared:
-    def __init__(self, data_path, usage_dict_path, timedeltas_list_path, history_size=3500, sample_negative=-1, max_padding=256, disable_tqdm=False):
-        self.disable_tqdm = disable_tqdm
-        self.data_path = data_path
-        self.usage_dict_path = usage_dict_path
-        self.history_size = history_size
-        self.sample_negative = sample_negative
+    def __init__(self, config):
+        self.disable_tqdm = config['disable_tqdm']
+        self.data_path = config['data_path']
+        self.usage_dict_path = config['usage_dict_path']
+        self.history_size = config['history_size']
+        self.sample_negative = config['sample_negative']
 
         self.data = pd.read_parquet(self.data_path)
 
@@ -22,23 +23,22 @@ class Ex2VecOriginalDatasetShared:
 
         self.data.set_index(['user_id', 'track_id'], inplace=True, drop=False)
 
-        self.max_padding = max_padding
+        self.max_padding = config['max_padding']
 
-        with open(usage_dict_path) as file:
+        with open(config['usage_dict_path']) as file:
             self.use_dict = {int(key): set(value) for key, value in json.load(file).items()}
 
-        with h5py.File(timedeltas_list_path, 'r') as f:
+        with h5py.File(config['timedeltas_list_path'], 'r') as f:
             self.offsets = f['offsets'][:]
             self.timestamps_flat = f['timestamps_flat'][:]
 
-            self.pos_dict = {tuple(x): i for i, x in enumerate(tqdm(f['user_item'], disable = self.disable_tqdm))}
+            self.pos_dict = {tuple(x): i for i, x in enumerate(tqdm(f['user_item'], disable=self.disable_tqdm))}
 
             total_size = (self.max_user + 1) * (self.max_item + 1)
             self.pos_array = np.full(total_size, -1, dtype=np.int32)
-            for i, (user, item) in enumerate(tqdm(f['user_item'], disable=disable_tqdm)):
-                    flat_index = user * (self.max_item + 1) + item
-                    self.pos_array[flat_index] = i
-
+            for i, (user, item) in enumerate(tqdm(f['user_item'], disable=config['disable_tqdm'])):
+                flat_index = user * (self.max_item + 1) + item
+                self.pos_array[flat_index] = i
 
     def __len__(self):
         return len(self.data)
@@ -94,10 +94,8 @@ GLOBAL_SHARED_DATA = {}
 
 
 class Ex2VecOriginalDatasetWrap(torch.utils.data.Dataset):
-    def __init__(self, dataset_id = 'default'):
-        if dataset_id not in GLOBAL_SHARED_DATA:
-            raise KeyError(f"Ex2VecOriginalDatasetShared group '{dataset_id}' not found in the GLOBAL_SHARED_DATA.")
-        self.shared_data = GLOBAL_SHARED_DATA[dataset_id]
+    def __init__(self, shared_data):
+        self.shared_data = shared_data
 
     def __len__(self):
         return self.shared_data.__len__()
