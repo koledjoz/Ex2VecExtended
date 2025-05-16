@@ -90,9 +90,6 @@ class Ex2VecOriginalDatasetShared:
         }
 
 
-GLOBAL_SHARED_DATA = {}
-
-
 class Ex2VecOriginalDatasetWrap(torch.utils.data.Dataset):
     def __init__(self, shared_data):
         self.shared_data = shared_data
