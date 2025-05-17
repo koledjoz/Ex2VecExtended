@@ -5,6 +5,13 @@ MODEL_REGISTRY = {
 }
 
 
+def load_model(config, checkpoint=None):
+    model = get_model(config)
+    if checkpoint is not None:
+        model.load_state_dict(checkpoint['model_state_dict'])
+    return model
+
+
 def get_model(config):
     try:
         return MODEL_REGISTRY[config['model_type'].lower()](config)
