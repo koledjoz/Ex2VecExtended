@@ -13,7 +13,7 @@ def train_model(epochs_done, epoch_count, model, dataloader_train, dataloader_va
     return None
 
 
-def prepare_training(model, train_data, val_data, checkpoint, train_config):
+def prepare_training(model, train_data, val_data, checkpoint, train_config, log_dir=None):
     match train_config['optimizer']:
         case "adam":
             optimizer = torch.optim.Adam(model.parameters(), lr=train_config['learning_rate'])
@@ -30,14 +30,11 @@ def prepare_training(model, train_data, val_data, checkpoint, train_config):
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         epochs_done = checkpoint['epoch']
 
-    losses = []
-
-    for i, loss in enumerate(train_config['loss']):
-        match loss:
-            case 'cross_entropy':
-                losses.append(torch.nn.CrossEntropyLoss())
-            case _:
-                raise ValueError(f"No such loss as {loss} currently supported.")
+    match train_config['loss']:
+        case 'cross_entropy':
+            loss = torch.nn.CrossEntropyLoss()
+        case _:
+            raise ValueError(f"No such loss as {train_config['loss']} currently supported.")
 
     with train_config['train'] as config:
         dataloader_train = torch.utils.data.DataLoader(train_data, batch_size=config['batch_size'],
@@ -50,4 +47,15 @@ def prepare_training(model, train_data, val_data, checkpoint, train_config):
     else:
         dataloader_val = None
 
-    return epochs_done, epoch_count, model, dataloader_train, dataloader_val, losses, train_config['device']
+    writer = torch.utils.tensorboard.SummaryWriter(log_dir=log_dir) if log_dir is not None else None
+
+    return {
+        "epochs_done": epochs_done,
+        "epoch_count": epoch_count,
+        "model": model,
+        "datalaoder_train": dataloader_train,
+        "dataloader_val": dataloader_val,
+        "loss": loss,
+        "device": train_config['device'],
+        "writer": writer
+    }
