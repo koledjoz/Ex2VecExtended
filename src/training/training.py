@@ -9,7 +9,7 @@ def eval_epoch_original(epoch_id, dataloader, model, metrics: dict):
     return None
 
 
-def train_model(epochs_done, epoch_count, model, dataloader_train, dataloader_val, loss):
+def train_model(epochs_done, epoch_count, model, dataloader_train, dataloader_val, loss, device):
     return None
 
 
@@ -50,4 +50,4 @@ def prepare_training(model, train_data, val_data, checkpoint, train_config):
     else:
         dataloader_val = None
 
-    return epochs_done, epoch_count, model, dataloader_train, dataloader_val, losses
+    return epochs_done, epoch_count, model, dataloader_train, dataloader_val, losses, train_config['device']
