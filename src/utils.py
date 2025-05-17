@@ -8,4 +8,4 @@ def load_config(config_path):
 
 
 def load_checkpoint(checkpoint_path):
-    return torch.load(checkpoint_path, weights_only=True)
+    return torch.load(checkpoint_path, weights_only=True) if checkpoint_path is not None else None
