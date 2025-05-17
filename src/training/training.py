@@ -1,16 +1,65 @@
 import torch
+from tqdm import tqdm
+
+from utils import collate_skip_stack_fn
 
 
-def train_epoch_original(epoch_id, dataloader, model, optimizer, loss, writer, verbose):
+def train_epoch_original(epoch_id, dataloader, model, device, optimizer, loss_fn, writer, verbose):
+    model.train()
 
-    return None
+    if verbose:
+        print(f'Running training for epoch {epoch_id}')
+
+    pbar = tqdm(enumerate(dataloader), total=len(dataloader), disable=(not verbose))
+
+    running_loss = 0.0
+    train_instances = 0
+
+    for i, batch in pbar:
+        if batch is None:
+            pbar.update(1)
+            continue
+
+        optimizer.zero_grad()
+
+        real = batch['real_values'].to(device)
+        user_id = batch['user_id'].to(device)
+        predict_items = batch['predict_items'].to(device)
+        timedeltas = batch['timedeltas'].to(device)
+        weights = batch['weights'].to(device)
+
+        output = model(user_id, predict_items, timedeltas, weights)
+
+        loss = loss_fn(output, real)
+
+        loss.backward()
+
+        optimizer.step()
+
+        loss_item = loss.item()
+        pbar.update(1)
+
+        if verbose:
+            pbar.set_description(f'Batch loss: {loss_item}')
+            train_instances += real.shape[0]
+            running_loss += loss_item * real.shape[0]
+
+        if writer is not None:
+            global_step = epoch_id * len(dataloader) + i
+            writer.add_scalar("Loss/train", loss.item(), global_step)
+            writer.add_scalar("Learning Rate", optimizer.param_groups[0]['lr'], global_step)
+
+    total_loss = running_loss / train_instances
+    if verbose:
+        print(f'   epoch {epoch_id} loss: {total_loss}')
+
 
 
 def eval_epoch_original(epoch_id, dataloader, model, metrics: dict):
     return None
 
 
-def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, dataloader_val, loss, device, writer):
+def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, dataloader_val, loss_fn, device, writer):
 
 
 
@@ -38,18 +87,20 @@ def prepare_training(model, train_data, val_data, checkpoint, train_config, log_
 
     match train_config['loss']:
         case 'cross_entropy':
-            loss = torch.nn.CrossEntropyLoss()
+            loss_fn = torch.nn.CrossEntropyLoss()
         case _:
             raise ValueError(f"No such loss as {train_config['loss']} currently supported.")
 
     with train_config['train'] as config:
         dataloader_train = torch.utils.data.DataLoader(train_data, batch_size=config['batch_size'],
-                                                       num_workers=config['num_workers'], shuffle=config['shuffle'])
+                                                       num_workers=config['num_workers'], shuffle=config['shuffle'],
+                                                       collate_fn=collate_skip_stack_fn)
 
     if val_data is not None:
         with train_config['val'] as config:
             dataloader_val = torch.utils.data.DataLoader(val_data, batch_size=config['batch_size'],
-                                                         num_workers=config['num_workers'], shuffle=config['shuffle'])
+                                                         num_workers=config['num_workers'], shuffle=config['shuffle'],
+                                                         collate_fn=collate_skip_stack_fn)
     else:
         dataloader_val = None
 
@@ -64,7 +115,7 @@ def prepare_training(model, train_data, val_data, checkpoint, train_config, log_
         "optimizer": optimizer,
         "dataloader_train": dataloader_train,
         "dataloader_val": dataloader_val,
-        "loss": loss,
+        "loss_fn": loss_fn,
         "device": train_config['device'],
         "writer": writer,
         "verbose": verbose
