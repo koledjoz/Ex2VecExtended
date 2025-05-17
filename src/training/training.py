@@ -9,7 +9,11 @@ def eval_epoch_original(epoch_id, dataloader, model, metrics: dict):
     return None
 
 
-def train_model(epochs_done, epoch_count, model, dataloader_train, dataloader_val, loss, device):
+def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, dataloader_val, loss, device, writer):
+
+
+
+
     return None
 
 
@@ -53,7 +57,8 @@ def prepare_training(model, train_data, val_data, checkpoint, train_config, log_
         "epochs_done": epochs_done,
         "epoch_count": epoch_count,
         "model": model,
-        "datalaoder_train": dataloader_train,
+        "optimizer": optimizer,
+        "dataloader_train": dataloader_train,
         "dataloader_val": dataloader_val,
         "loss": loss,
         "device": train_config['device'],
