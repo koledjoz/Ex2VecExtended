@@ -1,7 +1,8 @@
 import torch
 
 
-def train_epoch_original(epoch_id, dataloader, model, optimizer, loss):
+def train_epoch_original(epoch_id, dataloader, model, optimizer, loss, writer, verbose):
+
     return None
 
 
@@ -10,6 +11,7 @@ def eval_epoch_original(epoch_id, dataloader, model, metrics: dict):
 
 
 def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, dataloader_val, loss, device, writer):
+
 
 
 
@@ -53,6 +55,8 @@ def prepare_training(model, train_data, val_data, checkpoint, train_config, log_
 
     writer = torch.utils.tensorboard.SummaryWriter(log_dir=log_dir) if log_dir is not None else None
 
+    verbose = train_config['verbose'] if 'verbose' in train_config else False
+
     return {
         "epochs_done": epochs_done,
         "epoch_count": epoch_count,
@@ -62,5 +66,6 @@ def prepare_training(model, train_data, val_data, checkpoint, train_config, log_
         "dataloader_val": dataloader_val,
         "loss": loss,
         "device": train_config['device'],
-        "writer": writer
+        "writer": writer,
+        "verbose": verbose
     }
