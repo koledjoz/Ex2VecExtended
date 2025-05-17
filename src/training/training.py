@@ -4,7 +4,7 @@ from tqdm import tqdm
 from utils import collate_skip_stack_fn
 
 
-def train_epoch_original(epoch_id, dataloader, model, device, optimizer, loss_fn, writer, verbose):
+def train_epoch_original(epoch_id, dataloader, model, optimizer, loss_fn, device='cpu', writer=None, verbose=True):
     model.train()
 
     if verbose:
@@ -54,9 +54,57 @@ def train_epoch_original(epoch_id, dataloader, model, device, optimizer, loss_fn
         print(f'   epoch {epoch_id} loss: {total_loss}')
 
 
+def eval_epoch_original(epoch_id, dataloader, model, loss_fn, metrics = {}, device='cpu', writer=None, verbose=True):
+    model.eval()
 
-def eval_epoch_original(epoch_id, dataloader, model, metrics: dict):
-    return None
+    pbar = tqdm(enumerate(dataloader), total=len(dataloader), disable=(not verbose))
+
+    running_loss = 0.0
+    train_instances = 0
+
+    running_metrics = {key: 0.0 for key, _ in metrics}
+
+    with torch.no_grad():
+        for i, batch in pbar:
+            if batch is None:
+                pbar.update(1)
+                continue
+
+            real = batch['real_values'].to(device)
+            user_id = batch['user_id'].to(device)
+            predict_items = batch['predict_items'].to(device)
+            timedeltas = batch['timedeltas'].to(device)
+            weights = batch['weights'].to(device)
+
+            output = model(user_id, predict_items, timedeltas, weights)
+
+            loss = loss_fn(output, real)
+
+            loss_item = loss.item()
+
+            metrics_dict = {}
+
+            for key, value in metrics.items():
+                metrics_dict[key] = value(output, real)
+
+            if verbose:
+                running_metrics = {key: value + metrics_dict[key] * real.shape[0] for key, value in running_metrics.items()}
+                description = f'Batch loss: {loss_item:.04f}'.join([f';{key}: {value}' for key, value in metrics_dict.items()])
+                pbar.set_description(description)
+                train_instances += real.shape[0]
+                running_loss += loss_item * real.shape[0]
+
+            if writer is not None:
+                global_step = epoch_id * len(dataloader) + i
+                writer.add_scalar("Loss/train", loss.item(), global_step)
+                for key, val in metrics.items():
+                    writer.add_scalar(f'Metrics/{key}', val, global_step)
+
+            pbar.update(1)
+
+        if verbose:
+            print(f'   epoch {epoch_id} loss: {running_loss / train_instances}'.join(
+                [f';{key}: {value / train_instances}' for key, value in running_metrics.items()]))
 
 
 def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, dataloader_val, loss_fn, device, writer):
