@@ -1,5 +1,6 @@
 import torch
 from tqdm import tqdm
+import os
 
 from utils import collate_skip_stack_fn
 
@@ -106,14 +107,43 @@ def eval_epoch_original(epoch_id, dataloader, model, loss_fn, metrics = {}, devi
             print(f'   epoch {epoch_id} loss: {running_loss / train_instances}'.join(
                 [f';{key}: {value / train_instances}' for key, value in running_metrics.items()]))
 
-
-def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, dataloader_val, loss_fn, device, writer):
-
+        return running_loss / train_instances
 
 
+def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, dataloader_val, loss_fn, metrics={},
+                device='cpu', writer=None, verbose=False, save_best=False, save_last=1, save_dir='./checkpoints/'):
+    curr_epoch_id = epochs_done
+
+    best_loss = 100000.0
+
+    while curr_epoch_id < epoch_count:
+        train_epoch_original(curr_epoch_id, dataloader_train, model, optimizer, loss_fn, device, writer, verbose)
+
+        if dataloader_val is not None:
+            epoch_loss = eval_epoch_original(curr_epoch_id, dataloader_val, model, loss_fn, metrics, device, writer, verbose)
+
+            if save_best and epoch_loss < best_loss:
+                best_loss = epoch_loss
+                torch.save({
+                    'epoch': curr_epoch_id,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss': epoch_loss,
+                }, f'{save_dir}checkpoint_best.pt')
+
+            if save_last >= 1:
+                torch.save({
+                    'epoch': curr_epoch_id,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss': epoch_loss,
+                }, f'{save_dir}checkpoint_epoch{curr_epoch_id}.pt')
+
+            if save_last >= 2 and os.path.exists(f'{save_dir}checkpoint_epoch{curr_epoch_id-save_last}'):
+                os.remove(f'{save_dir}checkpoint_epoch{curr_epoch_id-save_last}')
+        curr_epoch_id += 1
 
 
-    return None
 
 
 def prepare_training(model, train_data, val_data, checkpoint, train_config, log_dir=None):
@@ -166,5 +196,5 @@ def prepare_training(model, train_data, val_data, checkpoint, train_config, log_
         "loss_fn": loss_fn,
         "device": train_config['device'],
         "writer": writer,
-        "verbose": verbose
+        "verbose": verbose,
     }
