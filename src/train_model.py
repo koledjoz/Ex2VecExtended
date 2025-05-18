@@ -74,7 +74,7 @@ def main():
 
     train_args = prepare_training(model, train_data, val_data, checkpoint, training_config, args.log_dir)
 
-    train_model(**train_args, save_best=args['save_best'], save_last=args['save_last'], save_dir=['checkpoint_save_dir'])
+    train_model(**train_args, save_best=args['save_best'], save_last=args['save_last'], save_dir=args['checkpoint_save_dir'])
 
 
 if __name__ == "__main__":
