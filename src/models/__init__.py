@@ -16,7 +16,9 @@ def get_model(config):
     try:
         return MODEL_REGISTRY[config['model_type'].lower()](config)
     except KeyError:
-        raise ValueError(f"Unknown model: {config['model_type']}. Available models: {list(MODEL_REGISTRY.keys())}")
+        raise ValueError(f"Probably nknown model: {config['model_type']}. "
+                         f"Available models: {list(MODEL_REGISTRY.keys())}. "
+                         f"Other options is missing value in config file. Please see previous exceptions.")
 
 
 def check_model(config):
