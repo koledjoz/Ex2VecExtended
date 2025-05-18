@@ -68,7 +68,7 @@ def main():
         model_config['n_users'] = max(train_data.get_n_users(), val_data.get_n_users() if val_data is not None else 0)
 
     if 'n_items' not in model_config:
-        model_config['n_items'] = max(train_data.get_n_item(), val_data.get_n_item() if val_data is not None else 0)
+        model_config['n_items'] = max(train_data.get_n_items(), val_data.get_n_items() if val_data is not None else 0)
 
     model = load_model(model_config, checkpoint=checkpoint)
 
