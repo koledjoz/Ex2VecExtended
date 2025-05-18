@@ -1,10 +1,10 @@
 import argparse
 
-from src.utils import load_config, load_checkpoint
-from src.models import check_model, get_available_models, load_model
-from src.data import check_dataset, get_available_datasets, get_dataset, init_dataset
+from utils import load_config, load_checkpoint
+from models import check_model, get_available_models, load_model
+from data import check_dataset, get_available_datasets, get_dataset, init_dataset
 
-from src.training.training import prepare_training, train_model
+from training.training import prepare_training, train_model
 
 def main():
     parser = argparse.ArgumentParser(description='Trains an Ex2Vec model.')
@@ -15,8 +15,6 @@ def main():
                         help='Path to the training dataset config file.')
     parser.add_argument('--config_data_val', type=str, required=False,
                         help='Path to the validation dataset config file.')
-    parser.add_argument('--dataset_type', type=str, required=True, help='type of the dataset to use')
-
     parser.add_argument('--checkpoint_load', type=str, required=False,
                         help='The path to a checkpoint if want to resume training.')
     parser.add_argument('--checkpoint_save_dir', type=str, required=False,
