@@ -10,7 +10,7 @@ from ..utils import sample_excluding
 
 class Ex2VecOriginalDatasetShared:
     def __init__(self, config):
-        self.disable_tqdm = config['disable_tqdm']
+        self.disable_tqdm = not config['verbose']
         self.data_path = config['data_path']
         self.usage_dict_path = config['usage_dict_path']
         self.history_size = config['history_size']
@@ -36,7 +36,7 @@ class Ex2VecOriginalDatasetShared:
 
             total_size = (self.max_user + 1) * (self.max_item + 1)
             self.pos_array = np.full(total_size, -1, dtype=np.int32)
-            for i, (user, item) in enumerate(tqdm(f['user_item'], disable=config['disable_tqdm'])):
+            for i, (user, item) in enumerate(tqdm(f['user_item'], disable=self.disable_tqdm)):
                 flat_index = user * (self.max_item + 1) + item
                 self.pos_array[flat_index] = i
 
