@@ -23,11 +23,11 @@ class Ex2VecOriginal(torch.nn.Module):
         self.cutoff = torch.nn.Parameter(torch.tensor(3.0))
 
         self.embedding_user = torch.nn.Embedding(
-            num_embeddings=self.n_users + 1, embedding_dim=self.latend_d
+            num_embeddings=self.n_users + 1, embedding_dim=self.latent_d
         )
 
         self.embedding_item = torch.nn.Embedding(
-            num_embeddings=self.n_items + 1, embedding_dim=self.latend_d
+            num_embeddings=self.n_items + 1, embedding_dim=self.latent_d
         )
 
         self.logistic = torch.nn.Sigmoid()
