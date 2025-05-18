@@ -55,8 +55,6 @@ def main():
 
     checkpoint = load_checkpoint(args.checkpoint_load)
 
-    model = load_model(model_config, checkpoint=checkpoint)
-
     init_dataset('train', train_dataset_config)
     train_data = get_dataset('train')
 
@@ -65,6 +63,14 @@ def main():
         val_data = get_dataset('val')
     else:
         val_data = None
+
+    if 'n_users' not in model_config:
+        model_config['n_users'] = max(train_data.get_n_users(), val_data.get_n_users() if val_data is not None else 0)
+
+    if 'n_items' not in model_config:
+        model_config['n_items'] = max(train_data.get_n_item(), val_data.get_n_item() if val_data is not None else 0)
+
+    model = load_model(model_config, checkpoint=checkpoint)
 
     train_args = prepare_training(model, train_data, val_data, checkpoint, training_config, args.log_dir)
 
