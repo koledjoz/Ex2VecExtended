@@ -23,7 +23,7 @@ def get_dataset(group_id):
     if group_id not in GLOBAL_SHARED_DATA:
         raise KeyError(f'No dataset found in group {group_id} in the GLOBAL_SHARED_DATA. Please initialize a dataset '
                        f'for this group first.')
-    return DATASET_INIT_REGISTRY[GROUP_TO_NAME[group_id]](GLOBAL_SHARED_DATA[group_id])
+    return DATASET_REGISTRY[GROUP_TO_NAME[group_id]](GLOBAL_SHARED_DATA[group_id])
 
 
 def check_dataset(config):
