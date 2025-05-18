@@ -55,7 +55,7 @@ def train_epoch_original(epoch_id, dataloader, model, optimizer, loss_fn, device
         print(f'   epoch {epoch_id} loss: {total_loss}')
 
 
-def eval_epoch_original(epoch_id, dataloader, model, loss_fn, metrics = {}, device='cpu', writer=None, verbose=True):
+def eval_epoch_original(epoch_id, dataloader, model, loss_fn, metrics={}, device='cpu', writer=None, verbose=True):
     model.eval()
 
     pbar = tqdm(enumerate(dataloader), total=len(dataloader), disable=(not verbose))
@@ -89,8 +89,10 @@ def eval_epoch_original(epoch_id, dataloader, model, loss_fn, metrics = {}, devi
                 metrics_dict[key] = value(output, real)
 
             if verbose:
-                running_metrics = {key: value + metrics_dict[key] * real.shape[0] for key, value in running_metrics.items()}
-                description = f'Batch loss: {loss_item:.04f}'.join([f';{key}: {value}' for key, value in metrics_dict.items()])
+                running_metrics = {key: value + metrics_dict[key] * real.shape[0] for key, value in
+                                   running_metrics.items()}
+                description = f'Batch loss: {loss_item:.04f}'.join(
+                    [f';{key}: {value}' for key, value in metrics_dict.items()])
                 pbar.set_description(description)
                 train_instances += real.shape[0]
                 running_loss += loss_item * real.shape[0]
@@ -120,7 +122,8 @@ def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, da
         train_epoch_original(curr_epoch_id, dataloader_train, model, optimizer, loss_fn, device, writer, verbose)
 
         if dataloader_val is not None:
-            epoch_loss = eval_epoch_original(curr_epoch_id, dataloader_val, model, loss_fn, metrics, device, writer, verbose)
+            epoch_loss = eval_epoch_original(curr_epoch_id, dataloader_val, model, loss_fn, metrics, device, writer,
+                                             verbose)
 
             if save_best and epoch_loss < best_loss:
                 best_loss = epoch_loss
@@ -139,11 +142,9 @@ def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, da
                     'loss': epoch_loss,
                 }, f'{save_dir}checkpoint_epoch{curr_epoch_id}.pt')
 
-            if save_last >= 2 and os.path.exists(f'{save_dir}checkpoint_epoch{curr_epoch_id-save_last}'):
-                os.remove(f'{save_dir}checkpoint_epoch{curr_epoch_id-save_last}')
+            if save_last >= 2 and os.path.exists(f'{save_dir}checkpoint_epoch{curr_epoch_id - save_last}'):
+                os.remove(f'{save_dir}checkpoint_epoch{curr_epoch_id - save_last}')
         curr_epoch_id += 1
-
-
 
 
 def prepare_training(model, train_data, val_data, checkpoint, train_config, log_dir=None):
@@ -169,16 +170,16 @@ def prepare_training(model, train_data, val_data, checkpoint, train_config, log_
         case _:
             raise ValueError(f"No such loss as {train_config['loss']} currently supported.")
 
-    with train_config['train'] as config:
-        dataloader_train = torch.utils.data.DataLoader(train_data, batch_size=config['batch_size'],
-                                                       num_workers=config['num_workers'], shuffle=config['shuffle'],
-                                                       collate_fn=collate_skip_stack_fn)
+    config = train_config['train']
+    dataloader_train = torch.utils.data.DataLoader(train_data, batch_size=config['batch_size'],
+                                                   num_workers=config['num_workers'], shuffle=config['shuffle'],
+                                                   collate_fn=collate_skip_stack_fn)
 
     if val_data is not None:
-        with train_config['val'] as config:
-            dataloader_val = torch.utils.data.DataLoader(val_data, batch_size=config['batch_size'],
-                                                         num_workers=config['num_workers'], shuffle=config['shuffle'],
-                                                         collate_fn=collate_skip_stack_fn)
+        config = train_config['val']
+        dataloader_val = torch.utils.data.DataLoader(val_data, batch_size=config['batch_size'],
+                                                     num_workers=config['num_workers'], shuffle=config['shuffle'],
+                                                     collate_fn=collate_skip_stack_fn)
     else:
         dataloader_val = None
 
