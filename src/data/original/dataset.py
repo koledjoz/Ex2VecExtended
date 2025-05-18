@@ -5,7 +5,7 @@ from tqdm import tqdm
 import torch
 import json
 
-from src.data.utils import sample_excluding
+from ..utils import sample_excluding
 
 
 class Ex2VecOriginalDatasetShared:

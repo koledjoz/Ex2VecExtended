@@ -2,7 +2,7 @@ import torch
 from tqdm import tqdm
 import os
 
-from utils import collate_skip_stack_fn
+from .utils import collate_skip_stack_fn
 
 
 def train_epoch_original(epoch_id, dataloader, model, optimizer, loss_fn, device='cpu', writer=None, verbose=True):
