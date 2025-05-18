@@ -40,6 +40,12 @@ class Ex2VecOriginalDatasetShared:
                 flat_index = user * (self.max_item + 1) + item
                 self.pos_array[flat_index] = i
 
+    def get_n_users(self):
+        return self.max_user
+
+    def get_n_items(self):
+        return self.max_item
+
     def __len__(self):
         return len(self.data)
 
@@ -93,6 +99,12 @@ class Ex2VecOriginalDatasetShared:
 class Ex2VecOriginalDatasetWrap(torch.utils.data.Dataset):
     def __init__(self, shared_data):
         self.shared_data = shared_data
+
+    def get_n_users(self):
+        return self.shared_data.get_n_users()
+
+    def get_n_items(self):
+        return self.shared_data.get_n_items()
 
     def __len__(self):
         return self.shared_data.__len__()
