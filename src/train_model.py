@@ -4,7 +4,7 @@ from utils import load_config, load_checkpoint
 from models import check_model, get_available_models, load_model
 from data import check_dataset, get_available_datasets, get_dataset, init_dataset
 
-from training.training import prepare_training, train_model
+from training.training import prepare_training, train_model_original
 
 def main():
     parser = argparse.ArgumentParser(description='Trains an Ex2Vec model.')
@@ -17,8 +17,6 @@ def main():
                         help='Path to the validation dataset config file.')
     parser.add_argument('--checkpoint_load', type=str, required=False,
                         help='The path to a checkpoint if want to resume training.')
-    parser.add_argument('--checkpoint_save_dir', type=str, required=False,
-                        help='Directory into which checkpoints should be saved.')
     parser.add_argument('--save_best', action='store_true',
                         help='Enables saving the the best model based on the validation score. Needs for the '
                              'checkpoint save directory and validation dataset config parameters to be present.')
@@ -74,7 +72,9 @@ def main():
 
     train_args = prepare_training(model, train_data, val_data, checkpoint, training_config, args.log_dir)
 
-    train_model(**train_args, save_best=args.save_best, save_last=args.save_last, save_dir=args.checkpoint_save_dir)
+    train_model_original(**train_args, save_best=args.save_best, save_last=args.save_last, save_dir=args.save_dir)
+
+    # should let know that training is done, so lets do that so i can tell when to come back to it
 
 
 if __name__ == "__main__":

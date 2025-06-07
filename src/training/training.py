@@ -112,8 +112,8 @@ def eval_epoch_original(epoch_id, dataloader, model, loss_fn, metrics={}, device
         return running_loss / train_instances
 
 
-def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, dataloader_val, loss_fn, metrics={},
-                device='cpu', writer=None, verbose=False, save_best=False, save_last=1, save_dir='./checkpoints/'):
+def train_model_original(epochs_done, epoch_count, model, optimizer, dataloader_train, dataloader_val, loss_fn, metrics={},
+                         device='cpu', writer=None, verbose=False, save_best=False, save_last=1, save_dir='./checkpoints/'):
     model = model.to(device)
 
     curr_epoch_id = epochs_done
