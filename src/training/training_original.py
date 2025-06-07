@@ -149,7 +149,7 @@ def train_model_original(epochs_done, epoch_count, model, optimizer, dataloader_
         curr_epoch_id += 1
 
 
-def prepare_training(model, train_data, val_data, checkpoint, train_config, log_dir=None):
+def prepare_training_original(model, train_data, val_data, checkpoint, train_config, log_dir=None):
     match train_config['optimizer']:
         case "adam":
             optimizer = torch.optim.Adam(model.parameters(), lr=train_config['learning_rate'])
