@@ -1,7 +1,9 @@
 from .original.model import Ex2VecOriginal
+from .extended.model import Ex2VecExtended
 
 MODEL_REGISTRY = {
     "original": Ex2VecOriginal,
+    "extended": Ex2VecExtended
 }
 
 
@@ -16,7 +18,7 @@ def get_model(config):
     try:
         return MODEL_REGISTRY[config['model_type'].lower()](config)
     except KeyError:
-        raise ValueError(f"Probably nknown model: {config['model_type']}. "
+        raise ValueError(f"Probably unknown model: {config['model_type']}. "
                          f"Available models: {list(MODEL_REGISTRY.keys())}. "
                          f"Other options is missing value in config file. Please see previous exceptions.")
 
