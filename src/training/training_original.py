@@ -97,14 +97,13 @@ def eval_epoch_original(epoch_id, dataloader, model, loss_fn, metrics={}, device
                 pbar.set_description(description)
                 train_instances += real.shape[0]
                 running_loss += loss_item * real.shape[0]
-
-            if writer is not None:
-                global_step = epoch_id * len(dataloader) + i
-                writer.add_scalar("Loss/train", loss.item(), global_step)
-                for key, val in metrics.items():
-                    writer.add_scalar(f'Metrics/{key}', val, global_step)
-
             pbar.update(1)
+
+        if writer is not None:
+            global_step = epoch_id * len(dataloader)
+            writer.add_scalar("Loss/val", loss.item(), global_step)
+            for key, val in metrics.items():
+                writer.add_scalar(f'Metrics/{key}', val, global_step)
 
         if verbose:
             print(f'   epoch {epoch_id} loss: {running_loss / train_instances}'.join(
