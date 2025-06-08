@@ -67,7 +67,7 @@ class Ex2VecExtendedDatasetShared:
         }
 
 
-class Ex2VecOriginalDatasetWrap(torch.utils.data.Dataset):
+class Ex2VecExtendedDatasetWrap(torch.utils.data.Dataset):
     def __init__(self, shared_data):
         self.shared_data = shared_data
 
