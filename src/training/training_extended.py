@@ -87,7 +87,7 @@ def eval_epoch_extended(epoch_id, dataloader, model, loss_fn, metrics={}, device
 
             metrics_dict = {}
 
-            for key, value in metrics.item():
+            for key, value in metrics.items():
                 metrics[key] = value(output, real)
 
             if verbose:
