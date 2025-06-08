@@ -4,7 +4,8 @@ from utils import load_config, load_checkpoint
 from models import check_model, get_available_models, load_model
 from data import check_dataset, get_available_datasets, get_dataset, init_dataset
 
-from training.training import prepare_training_original, train_model_original
+from training.training_original import prepare_training_original, train_model_original
+from training.training_extended import prepare_training_extended, train_model_extended
 
 def main():
     parser = argparse.ArgumentParser(description='Trains an Ex2Vec model.')
@@ -70,9 +71,12 @@ def main():
 
     model = load_model(model_config, checkpoint=checkpoint)
 
-    train_args = prepare_training_original(model, train_data, val_data, checkpoint, training_config, args.log_dir)
-
-    train_model_original(**train_args, save_best=args.save_best, save_last=args.save_last, save_dir=args.save_dir)
+    if 'model_type' in model_config and model_config['model_type'] == 'original':
+        train_args = prepare_training_original(model, train_data, val_data, checkpoint, training_config, args.log_dir)
+        train_model_original(**train_args, save_best=args.save_best, save_last=args.save_last, save_dir=args.save_dir)
+    elif 'model_type' in model_config and model_config['model_type'] == 'original':
+        train_args = prepare_training_extended(model, train_data, val_data, checkpoint, training_config, args.log_dir)
+        train_model_extended(**train_args, save_best=args.save_best, save_last=args.save_last, save_dir=args.save_dir)
 
     # should let know that training is done, so lets do that so i can tell when to come back to it
 
