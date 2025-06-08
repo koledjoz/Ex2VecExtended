@@ -1,6 +1,7 @@
 import torch
 from tqdm import tqdm
 import os
+from torch.utils.tensorboard import SummaryWriter
 
 from .utils import collate_skip_stack_fn
 
@@ -186,7 +187,7 @@ def prepare_training_extended(model, train_data, val_data, checkpoint, train_con
     else:
         dataloader_val = None
 
-    writer = torch.utils.tensorboard.SummaryWriter(log_dir=log_dir) if log_dir is not None else None
+    writer = SummaryWriter(log_dir=log_dir) if log_dir is not None else None
 
     verbose = train_config['verbose'] if 'verbose' in train_config else False
 
