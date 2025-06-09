@@ -17,6 +17,9 @@ def train_epoch_extended(epoch_id, dataloader, model, optimizer, loss_fn, device
     running_loss = 0.0
     train_instances = 0
 
+    log_every = 500
+    losses = []
+
     for i, batch in pbar:
         if batch is None:
             pbar.update(1)
@@ -38,17 +41,25 @@ def train_epoch_extended(epoch_id, dataloader, model, optimizer, loss_fn, device
 
         optimizer.step()
 
+        losses.append(loss.detach())
+
         loss_item = loss.item()
 
-        if verbose:
+        if verbose and i % log_every == 0:
+            loss_item = torch.stack(losses).mean().item()
             pbar.set_description(f'Batch loss: {loss_item}')
-            train_instances += real.shape[0]
-            running_loss += loss_item * real.shape[0]
 
-        if writer is not None:
+        running_loss += loss.detach() * real.size(0)
+        train_instances += real.size(0)
+
+        if writer is not None and i % log_every == 0:
             global_step = epoch_id * len(dataloader) + i
-            writer.add_scalar("Loss/train", loss.item(), global_step)
+            loss_item = torch.stack(losses).mean().item()
+            writer.add_scalar("Loss/train", loss_item, global_step)
             writer.add_scalar("Learning Rate", optimizer.param_groups[0]['lr'], global_step)
+
+        if i % log_every == 0:
+            losses = []
 
 
     total_loss = running_loss / train_instances
