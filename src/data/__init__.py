@@ -43,3 +43,7 @@ def is_initialized(group_id):
 
 def get_initialized():
     list(GLOBAL_SHARED_DATA.keys())
+
+
+def get_dataset_type(model_type):
+    return DATASET_REGISTRY[model_type]

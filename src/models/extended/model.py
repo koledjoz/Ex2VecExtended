@@ -1,14 +1,14 @@
 import torch
+from ..base_model import BaseModel
 
-
-class Ex2VecExtended(torch.nn.Module):
+class Ex2VecExtended(BaseModel):
     def __init__(self, config):
         super(Ex2VecExtended, self).__init__()
         self.config = config
         self.n_users = config['n_users']
         self.n_items = config['n_items']
-        self.latend_d = config['latent_d']
-
+        self.latent_d = config['latent_d']
+        # model.global_lamb, model.alpha, model.beta, model.gamma, model.cutoff, model.smooth, model.force
         self.global_lamb = torch.nn.Parameter(torch.tensor(1.0))
 
         self.user_lamb = torch.nn.Embedding(self.n_users + 1, 1)
@@ -23,11 +23,11 @@ class Ex2VecExtended(torch.nn.Module):
         self.cutoff = torch.nn.Parameter(torch.tensor(3.0))
 
         self.embedding_user = torch.nn.Embedding(
-            num_embeddings=self.n_users + 1, embedding_dim=self.latend_d
+            num_embeddings=self.n_users + 1, embedding_dim=self.latent_d
         )
 
         self.embedding_item = torch.nn.Embedding(
-            num_embeddings=self.n_items + 1, embedding_dim=self.latend_d
+            num_embeddings=self.n_items + 1, embedding_dim=self.latent_d
         )
 
         self.logistic = torch.nn.Sigmoid()
@@ -50,8 +50,13 @@ class Ex2VecExtended(torch.nn.Module):
 
         dist = torch.norm(pred_items_emb - history_items_emb, dim=-1)
 
-        dist = self.logistic(self.smooth / (1 + dist) - self.force * self.smooth) / self.logistic(
+        weight = self.logistic(self.smooth / (1 + dist) - self.force * self.smooth) / self.logistic(
             self.smooth - self.force * self.smooth)
+
+        dist = dist * weight
+
+        # dist = self.logistic(self.smooth / (1 + dist) - self.force * self.smooth) / self.logistic(
+        #     self.smooth - self.force * self.smooth)
 
         history_timedeltas = (history_timedeltas + self.cutoff) ** -0.5
 
@@ -73,3 +78,12 @@ class Ex2VecExtended(torch.nn.Module):
         I = self.alpha * output + self.beta * torch.pow(output, 2) + self.gamma + u_bias + i_bias
 
         return I
+
+    def forward_batch(self, batch, device):
+        user_id = batch['user_id'].to(device)
+        predict_items = batch['predict_items'].to(device)
+        history_items = batch['history_items'].to(device)
+        timedeltas = batch['timedeltas'].to(device)
+        weights = batch['weights'].to(device)
+
+        return self.forward(user_id, predict_items, history_items, timedeltas, weights)

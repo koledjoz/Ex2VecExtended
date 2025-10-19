@@ -65,6 +65,8 @@ class Ex2VecOriginalDatasetShared:
             true_vals = np.zeros(self.max_item)
             samples = np.empty(self.max_item, dtype=np.int32)
             timedeltas = np.zeros((self.max_item, self.max_padding), dtype=np.float32)
+
+        # print(f'\tTimedeltas shape: {timedeltas.shape}')
         true_vals[-1] = 1.0
 
         samples[:-1] = sample_excluding(self.max_item, self.sample_negative, pred_item)
@@ -83,7 +85,15 @@ class Ex2VecOriginalDatasetShared:
         ends = starts + lengths
 
         for i, (start, end, length, sample_idx) in enumerate(zip(starts, ends, lengths, valid_indices)):
-            timedeltas[sample_idx, :length] = ts - self.timestamps_flat[start:end]
+            # print(f'\t{(sample_idx, length, start, end, ts)}')
+            # print(f'\t{timedeltas[sample_idx, :length]} <--- {ts - self.timestamps_flat[start:min(end, start + self.history_size, start + self.max_padding)]}')
+            # print(f'\t{timedeltas[sample_idx, :length].shape} <--- {(ts - self.timestamps_flat[start:min(end, start + self.history_size, start + self.max_padding)]).shape}')
+            adding = ts - self.timestamps_flat[start:min(end, start + self.history_size, start + self.max_padding)]
+            adding = np.pad(adding, (0, len(timedeltas[sample_idx, :length]) - len(adding)), 'constant', constant_values=0)
+            # print(f'Wanted length is {len(timedeltas[sample_idx, :length])}')
+            # print(
+            #     f'\t{timedeltas[sample_idx, :length]} <--- {adding}')
+            timedeltas[sample_idx, :length] = adding
 
         weights = timedeltas > 0
 

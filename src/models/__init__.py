@@ -29,3 +29,7 @@ def check_model(config):
 
 def get_available_models():
     return list(MODEL_REGISTRY.keys())
+
+
+def get_model_type(model_type):
+    return MODEL_REGISTRY[model_type]

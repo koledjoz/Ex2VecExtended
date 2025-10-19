@@ -1,7 +1,8 @@
 import torch
+from ..base_model import BaseModel
 
 
-class Ex2VecOriginal(torch.nn.Module):
+class Ex2VecOriginal(BaseModel):
     def __init__(self, config):
         super(Ex2VecOriginal, self).__init__()
         self.config = config
@@ -56,3 +57,11 @@ class Ex2VecOriginal(torch.nn.Module):
         output = torch.maximum(torch.zeros_like(base_dist), base_dist - base_level)
 
         return self.alpha * output + self.beta * torch.pow(output, 2) + self.gamma + u_bias + i_bias
+
+    def forward_batch(self, batch, device):
+        user_id = batch['user_id'].to(device)
+        predict_items = batch['predict_items'].to(device)
+        timedeltas = batch['timedeltas'].to(device)
+        weights = batch['weights'].to(device)
+
+        return self.forward(user_id, predict_items, timedeltas, weights)

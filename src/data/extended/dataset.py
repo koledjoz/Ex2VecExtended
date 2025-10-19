@@ -14,7 +14,7 @@ class Ex2VecExtendedDatasetShared:
         self.usage_dict_path = config['usage_dict_path']
         self.grouping_size = config['grouping_size']
         self.sample_negative = config['sample_negative']
-        self.history_size = config['history_size']
+        self.max_padding = config['max_padding']
 
         self.data = pd.read_parquet(self.data_path)
 
@@ -43,7 +43,7 @@ class Ex2VecExtendedDatasetShared:
         pred_items = np.append(np.array(sample_excluding(self.max_item, self.sample_negative, pred_item)), pred_item)
         true_vals = np.append(np.array([0.0 for _ in range(len(pred_items) - 1)]), 1.0)
 
-        history = self.data.iloc[max(idx - self.history_size, 0):idx]
+        history = self.data.iloc[max(idx - self.max_padding, 0):idx]
         history = history[history['user_id'] == pred_user_id]
 
         ts = self.data.iloc[idx]['ts']
@@ -52,10 +52,10 @@ class Ex2VecExtendedDatasetShared:
         history_items = history['track_id'].to_numpy()
         weights = np.ones_like(history_items)
 
-        timedeltas = np.pad(timedeltas, (0, self.history_size - len(timedeltas)), mode='constant', constant_values=0)
-        history_items = np.pad(history_items, (0, self.history_size - len(history_items)), mode='constant',
+        timedeltas = np.pad(timedeltas, (0, self.max_padding - len(timedeltas)), mode='constant', constant_values=0)
+        history_items = np.pad(history_items, (0, self.max_padding - len(history_items)), mode='constant',
                                constant_values=0)
-        weights = np.pad(weights, (0, self.history_size - len(weights)), mode='constant', constant_values=0)
+        weights = np.pad(weights, (0, self.max_padding - len(weights)), mode='constant', constant_values=0)
 
         return {
             'user_id': torch.tensor(pred_user_id),
