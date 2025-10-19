@@ -1,0 +1,10 @@
+{
+  "dataset_type": "original",
+  "verbose": false,
+  "data_path": "./tests/files/testing_data.parquet",
+  "usage_dict_path": "./tests/files/testing_data_dict.json",
+  "timedeltas_list_path": "./tests/files/testing_interactions.h5",
+  "history_size": 4,
+  "sample_negative": -1,
+  "max_padding": 4
+}
