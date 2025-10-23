@@ -171,6 +171,7 @@ def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, da
 
 
 def prepare_training(model, train_data, val_data, checkpoint, train_config, log_dir=None):
+    print(f'Log dir can be found in {log_dir}')
     optimizer = get_optimizer(train_config['optimizer'])(model.parameters(), lr=train_config['learning_rate'])
 
     epochs_done = 0
