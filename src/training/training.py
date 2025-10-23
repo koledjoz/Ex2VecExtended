@@ -121,7 +121,7 @@ def eval_epoch(epoch_id, dataloader, model, loss_fn, metrics={}, device='cpu', w
 
         if writer is not None:
             global_step = epoch_id * len(dataloader)
-            writer.add_scalar("Loss/val", loss.item() / train_instances, global_step)
+            writer.add_scalar("Loss/val", running_loss / train_instances, global_step)
             for key, val in running_metrics.items():
                 writer.add_scalar(f'Metrics/{key}', val / train_instances, global_step)
 
