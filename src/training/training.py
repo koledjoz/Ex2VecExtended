@@ -106,9 +106,7 @@ def eval_epoch(epoch_id, dataloader, model, loss_fn, metrics={}, device='cpu', w
             loss = loss_fn(output, real).item()
 
             metrics_dict = {}
-            print('Metrics:', metrics)
             for key, value in metrics.items():
-                print(value(output, real))
                 running_metrics[key] = running_metrics[key] + value(output, real).item() * real.shape[0]
                 metrics_dict[key] = value(output, real).item()
             train_instances += real.shape[0]
@@ -147,15 +145,15 @@ def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, da
         train_epoch(curr_epoch_id, dataloader_train, model, optimizer, loss_fn, device, writer, verbose, **kwargs)
 
         if dataloader_val is not None:
-            metrics = eval_epoch(curr_epoch_id, dataloader_val, model, loss_fn, metrics, device, writer, verbose, **kwargs)
+            metrics_results = eval_epoch(curr_epoch_id, dataloader_val, model, loss_fn, metrics, device, writer, verbose, **kwargs)
 
-            if save_best and metrics['loss'] < best_loss:
-                best_loss = metrics['loss']
+            if save_best and metrics_results['loss'] < best_loss:
+                best_loss = metrics_results['loss']
                 save_training_state({
                     'epoch': curr_epoch_id,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
-                    'loss': metrics['loss'],
+                    'loss': metrics_results['loss'],
                 }, f'{save_dir}checkpoint_best.pt')
 
             if save_last >= 1:
@@ -163,7 +161,7 @@ def train_model(epochs_done, epoch_count, model, optimizer, dataloader_train, da
                     'epoch': curr_epoch_id,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
-                    'loss': metrics['loss'],
+                    'loss': metrics_results['loss'],
                 }, f'{save_dir}checkpoint_epoch{curr_epoch_id}.pt')
 
             if save_last >= 2 and os.path.exists(f'{save_dir}checkpoint_epoch{curr_epoch_id - save_last}.pt'):
