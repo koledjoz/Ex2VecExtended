@@ -106,7 +106,9 @@ def eval_epoch(epoch_id, dataloader, model, loss_fn, metrics={}, device='cpu', w
             loss = loss_fn(output, real).item()
 
             metrics_dict = {}
+            print('Metrics:', metrics)
             for key, value in metrics.items():
+                print(value(output, real))
                 running_metrics[key] = running_metrics[key] + value(output, real).item() * real.shape[0]
                 metrics_dict[key] = value(output, real).item()
             train_instances += real.shape[0]
