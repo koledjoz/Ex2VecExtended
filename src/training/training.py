@@ -217,6 +217,7 @@ def prepare_training(model, train_data, val_data, checkpoint, train_config, log_
         "device": train_config['device'],
         "writer": writer,
         "verbose": verbose,
-        "metrics": metrics
+        "metrics": metrics,
+        'log_step': train_config['log_step']
     }
 
