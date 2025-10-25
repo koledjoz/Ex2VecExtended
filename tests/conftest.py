@@ -233,14 +233,17 @@ def training_config():
         "device": "cuda:0",
         "loss": "cross_entropy",
         "metrics": ["cross_entropy"],
+        "log_step": 500,
         "train": {
             "batch_size": 32,
             "num_workers": 2,
-            "shuffle": True
+            "shuffle": True,
+            "log_step": 500
         },
         "val": {
             "batch_size": 32,
             "num_workers": 2,
-            "shuffle": False
+            "shuffle": False,
+            "log_step": 500
         }
     }
