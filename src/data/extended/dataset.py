@@ -12,7 +12,7 @@ class Ex2VecExtendedDatasetShared:
         self.disable_tqdm = not config['verbose']
         self.data_path = config['data_path']
         self.usage_dict_path = config['usage_dict_path']
-        self.grouping_size = config['grouping_size']
+        self.history_size = config['history_size']
         self.sample_negative = config['sample_negative']
         self.max_padding = config['max_padding']
 
@@ -43,7 +43,7 @@ class Ex2VecExtendedDatasetShared:
         pred_items = np.append(np.array(sample_excluding(self.max_item, self.sample_negative, pred_item)), pred_item)
         true_vals = np.append(np.array([0.0 for _ in range(len(pred_items) - 1)]), 1.0)
 
-        history = self.data.iloc[max(idx - self.max_padding, 0):idx]
+        history = self.data.iloc[max(idx - self.history_size, 0):idx]
         history = history[history['user_id'] == pred_user_id]
 
         ts = self.data.iloc[idx]['ts']
