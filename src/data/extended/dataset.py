@@ -52,6 +52,12 @@ class Ex2VecExtendedDatasetShared:
         history_items = history['track_id'].to_numpy()
         weights = np.ones_like(history_items)
 
+        # first, lets cut these to a max size of max_padding
+        timedeltas = timedeltas[:self.max_padding]
+        history_items = history_items[:self.max_padding]
+        weights = weights[:self.max_padding]
+
+
         timedeltas = np.pad(timedeltas, (0, self.max_padding - len(timedeltas)), mode='constant', constant_values=0)
         history_items = np.pad(history_items, (0, self.max_padding - len(history_items)), mode='constant',
                                constant_values=0)
