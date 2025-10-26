@@ -1,9 +1,11 @@
 from .original.model import Ex2VecOriginal
 from .extended.model import Ex2VecExtended
+from .extendedDouble.model import Ex2VecExtendedDouble
 
 MODEL_REGISTRY = {
     "original": Ex2VecOriginal,
-    "extended": Ex2VecExtended
+    "extended": Ex2VecExtended,
+    "extendeddouble": Ex2VecExtendedDouble
 }
 
 

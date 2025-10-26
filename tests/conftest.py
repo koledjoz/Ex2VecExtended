@@ -3,6 +3,7 @@ import torch
 
 from models.original.model import Ex2VecOriginal
 from models.extended.model import Ex2VecExtended
+from models.extendedDouble.model import Ex2VecExtendedDouble
 from data import init_dataset, get_dataset
 
 
@@ -13,6 +14,8 @@ def true_dataset_factory():
         if model_type == 'original':
             return torch.load('./tests/files/test_data_original.pt')
         elif model_type == 'extended':
+            return torch.load('./tests/files/test_data_extended.pt')
+        elif model_type == 'extendeddouble':
             return torch.load('./tests/files/test_data_extended.pt')
         else:
             raise RuntimeError(f"Unknown parameter {model_type}")
@@ -30,6 +33,9 @@ def train_data_config_factory():
         if model_type == 'original':
             data_config['dataset_type'] = 'original'
         elif model_type == 'extended':
+            data_config['dataset_type'] = 'extended'
+            data_config['grouping_size'] = 1000
+        elif model_type == 'extendeddouble':
             data_config['dataset_type'] = 'extended'
             data_config['grouping_size'] = 1000
         else:
@@ -66,6 +72,8 @@ def model_factory(model_config):
             return Ex2VecOriginal(model_config)
         elif model_type == 'extended':
             return Ex2VecExtended(model_config)
+        elif model_type == 'extendeddouble':
+            return Ex2VecExtendedDouble(model_config)
         else:
             raise RuntimeError(f"Unknown parameter {model_type}")
 
@@ -105,6 +113,8 @@ def check_dataloader_shapes_factory():
             return _original_check_shapes
         elif model_type == 'extended':
             return _extended_check_shapes
+        elif model_type == 'extendeddouble':
+            return _extended_check_shapes
         else:
             raise RuntimeError(f"Unknown parameter {model_type}")
 
@@ -125,6 +135,14 @@ def _extended_check_model(model):
     assert model.item_bias.weight.shape == (model.n_items + 1, 1)
     assert model.user_lamb.weight.shape == (model.n_users + 1, 1)
 
+def _extended_double_check_model(model):
+    assert model.embedding_user.weight.shape == (model.n_users + 1, model.latent_d)
+    assert model.embedding_item_base.weight.shape == (model.n_items + 1, model.latent_d)
+    assert model.embedding_item_extension.weight.shape == (model.n_items + 1, model.latent_d)
+    assert model.user_bias.weight.shape == (model.n_users + 1, 1)
+    assert model.item_bias.weight.shape == (model.n_items + 1, 1)
+    assert model.user_lamb.weight.shape == (model.n_users + 1, 1)
+
 
 @pytest.fixture
 def check_model_loaded_factory():
@@ -133,6 +151,8 @@ def check_model_loaded_factory():
             return _original_check_model
         elif model_type == 'extended':
             return _extended_check_model
+        elif model_type == 'extendeddouble':
+            return _extended_double_check_model
         else:
             raise RuntimeError(f"Unknown parameter {model_type}")
 
@@ -175,6 +195,8 @@ def prepare_input_factory():
             return _original_prepare_input
         elif model_type == 'extended':
             return _extended_prepare_input
+        elif model_type == 'extendeddouble':
+            return _extended_prepare_input
         else:
             raise RuntimeError(f"Unknown parameter {model_type}")
     return _prepare_input
@@ -193,6 +215,8 @@ def check_output_factory():
         if model_type == 'original':
             return _original_check_output
         elif model_type == 'extended':
+            return _extended_check_output
+        elif model_type == 'extendeddouble':
             return _extended_check_output
         else:
             raise RuntimeError(f"Unknown parameter {model_type}")
@@ -217,6 +241,8 @@ def check_scalars_factory():
         if model_type == 'original':
             return _original_check_scalars
         elif model_type == 'extended':
+            return _extended_check_scalars
+        elif model_type == 'extendeddouble':
             return _extended_check_scalars
         else:
             raise RuntimeError(f"Unknown parameter {model_type}")

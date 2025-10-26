@@ -3,12 +3,14 @@ from .extended.dataset import Ex2VecExtendedDatasetWrap, Ex2VecExtendedDatasetSh
 
 DATASET_REGISTRY = {
     "original": Ex2VecOriginalDatasetWrap,
-    "extended": Ex2VecExtendedDatasetWrap
+    "extended": Ex2VecExtendedDatasetWrap,
+    "extendeddouble": Ex2VecExtendedDatasetWrap
 }
 
 DATASET_INIT_REGISTRY = {
     "original": Ex2VecOriginalDatasetShared,
-    "extended": Ex2VecExtendedDatasetShared
+    "extended": Ex2VecExtendedDatasetShared,
+    "extendeddouble": Ex2VecExtendedDatasetShared
 }
 
 GROUP_TO_NAME = {}
