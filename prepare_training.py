@@ -97,7 +97,7 @@ def main():
     with open(os.path.join(test_dir_path, 'test_dict.json'), "w") as f:
         json.dump(sampled_dict, f, indent=4)
 
-    merged = df.merge(sampled, on=['user_id', 'track_id'], how='left', indicator=True)
+    merged = df[['user_id', 'track_id']].drop_duplicates().merge(sampled, on=['user_id', 'track_id'], how='left', indicator=True)
 
     df = merged[merged['_merge'] == 'left_only'].drop(columns=['_merge'])
 
@@ -154,7 +154,7 @@ def main():
 
         logging.info(f'[Split {split_num}]: Saving the training interactions')
 
-        save_user_track_interactions_to_hdf5(df_new, os.path.join(split_train_path, 'interactions.h5'))
+        # save_user_track_interactions_to_hdf5(df_new, os.path.join(split_train_path, 'interactions.h5'))
 
         sampled_dict = df_new.groupby('user_id')['track_id'].apply(list).to_dict()
 
