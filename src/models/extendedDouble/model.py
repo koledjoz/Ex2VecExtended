@@ -68,7 +68,7 @@ class Ex2VecExtendedDouble(BaseModel):
         pretrained_path = config.get('pretrained_embeddings_path', None)
         if pretrained_path:
             ids, embs = load_item_extension_from_parquet(pretrained_path)
-            if embs.shape[1] != self.embedding_item_extension.shape[1]:
+            if embs.shape[1] != self.embedding_item_extension.weights.shape[1]:
                 raise ValueError(f"Dim mismatch: file d={embs.shape[1]} vs model d={self.embedding_item_extension.shape[1]}")
 
             for i, item_id in enumerate(ids):
