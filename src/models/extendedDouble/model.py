@@ -73,8 +73,12 @@ class Ex2VecExtendedDouble(BaseModel):
             with open(config['item_mapping'], 'r') as fp:
                 mapping = json.load(fp)
 
-            for i, item_id in enumerate(ids):
-                self.embedding_item_extension[mapping[item_id]] = embs[i]
+            with torch.no_grad():
+                for i, item_id in enumerate(ids):
+                    if str(item_id) not in mapping:
+                        continue
+                    mapped_id = mapping[str(item_id)]
+                    self.embedding_item_extension.weight[mapped_id] = embs[i]
 
         if config.get("freeze_item_extension", False):
             self.embedding_item_extension.weight.requires_grad_(False)
@@ -82,16 +86,17 @@ class Ex2VecExtendedDouble(BaseModel):
     def forward(self, user_index, pred_item_indices, history_item_indices, history_timedeltas, history_weights):
         user_emb = self.embedding_user(user_index).unsqueeze(1)
 
-        pred_items_emb = self.embedding_item_base(pred_item_indices)
+        pred_items_emb_base = self.embedding_item_base(pred_item_indices)
+        pred_items_emb_extended = self.embedding_item_extension(pred_item_indices)
 
-        dist_user_item = torch.norm(user_emb - pred_items_emb, dim=2)
+        dist_user_item = torch.norm(user_emb - pred_items_emb_base, dim=2)
 
         history_items_emb_ext = self.embedding_item_extension(history_item_indices) # these are the extensions
 
-        pred_items_emb = pred_items_emb.unsqueeze(1)
+        pred_items_emb_extended = pred_items_emb_extended.unsqueeze(1)
         history_items_emb_ext = history_items_emb_ext.unsqueeze(2)
 
-        dist = torch.norm(pred_items_emb - history_items_emb_ext, dim=-1)
+        dist = torch.norm(pred_items_emb_extended - history_items_emb_ext, dim=-1)
 
         weight = self.logistic(self.smooth / (1 + dist) - self.force * self.smooth) / self.logistic(
             self.smooth - self.force * self.smooth)
