@@ -1,3 +1,4 @@
+import json
 import torch
 import pyarrow.parquet as pq
 from ..base_model import BaseModel
@@ -52,7 +53,7 @@ class Ex2VecExtendedDouble(BaseModel):
         )
 
         self.embedding_item_extension = torch.nn.Embedding(
-            num_embeddings=self.n_items + 1, embedding_dim=self.latent_d
+            num_embeddings=self.n_items + 1, embedding_dim=128
         )
 
         print(f'Base item emb shape: {self.embedding_item_extension.weight.shape}')
@@ -68,11 +69,12 @@ class Ex2VecExtendedDouble(BaseModel):
         pretrained_path = config.get('pretrained_embeddings_path', None)
         if pretrained_path:
             ids, embs = load_item_extension_from_parquet(pretrained_path)
-            if embs.shape[1] != self.embedding_item_extension.weight.shape[1]:
-                raise ValueError(f"Dim mismatch: file d={embs.shape[1]} vs model d={self.embedding_item_extension.shape[1]}")
+
+            with open(config['item_mapping'], 'r') as fp:
+                mapping = json.load(fp)
 
             for i, item_id in enumerate(ids):
-                self.embedding_item_extension[item_id] = embs[i]
+                self.embedding_item_extension[mapping[item_id]] = embs[i]
 
         if config.get("freeze_item_extension", False):
             self.embedding_item_extension.weight.requires_grad_(False)
