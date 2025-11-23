@@ -42,17 +42,17 @@ def predict(model, dataloader, device, verbose, top_k, output_path):
             if batch is None:
                 pbar.update(1)
                 continue
-            real = batch['real_values'].to(device)
-            model_result = model.forward_batch(batch, device).numpy()
+            real = batch['real_values'].cpu().numpy
+            model_result = model.forward_batch(batch, device).cpu().numpy()
 
-            user_id = batch['user_id'].numpy()
-            item_id = batch['predict_items'].numpy()
-            ts = batch['predict_ts'].numpy()
+            user_id = batch['user_id'].cpu().numpy()
+            item_id = batch['predict_items'].cpu().numpy()
+            ts = batch['predict_ts'].cpu().numpy()
 
             idx = real.argmax(axis=1)  # shape (B,)
             item_id = item_id[np.arange(len(item_id)), idx]
 
-            predict_items = batch['predict_items'].numpy()
+            predict_items = batch['predict_items'].cpu().numpy()
 
             # get the output of this
             idx = np.argsort(-model_result, axis=1)
