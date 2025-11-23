@@ -62,7 +62,7 @@ def predict(model, dataloader, device, verbose, top_k, output_path):
 
             u = user_id.reshape(-1)[:, None]  # -> (B, 1)
             i = item_id.reshape(-1)[:, None]  # -> (B, 1)
-            t = item_id.reshape(-1)[:, None]  # -> (B, 1)
+            t = ts.reshape(-1)[:, None]  # -> (B, 1)
             c = predict_items
 
             data = np.concatenate([u, i, t, c], axis=1)
@@ -73,4 +73,4 @@ def predict(model, dataloader, device, verbose, top_k, output_path):
             pbar.update(1)
 
     df_preds = pd.concat(all_batches, ignore_index=True)
-    df_preds.to_csv(output_path)
+    df_preds.to_csv(output_path, index=False)
