@@ -42,7 +42,7 @@ def predict(model, dataloader, device, verbose, top_k, output_path):
             if batch is None:
                 pbar.update(1)
                 continue
-            real = batch['real_values'].cpu().numpy
+            real = batch['real_values'].cpu().numpy()
             model_result = model.forward_batch(batch, device).cpu().numpy()
 
             user_id = batch['user_id'].cpu().numpy()
