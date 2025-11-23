@@ -33,6 +33,9 @@ class Ex2VecExtendedDouble(BaseModel):
         self.latent_d = config['latent_d']
         self.global_lamb = torch.nn.Parameter(torch.tensor(1.0))
 
+        # check if there is a pretrained weight passed
+        pretrained_path = config.get('pretrained_embeddings_path', None)
+
         self.user_lamb = torch.nn.Embedding(self.n_users + 1, 1)
 
         self.user_bias = torch.nn.Embedding(self.n_users + 1, 1)
@@ -53,7 +56,7 @@ class Ex2VecExtendedDouble(BaseModel):
         )
 
         self.embedding_item_extension = torch.nn.Embedding(
-            num_embeddings=self.n_items + 1, embedding_dim=128
+            num_embeddings=self.n_items + 1, embedding_dim=64 if pretrained_path is None else 128
         )
 
         print(f'Base item emb shape: {self.embedding_item_extension.weight.shape}')
@@ -65,8 +68,7 @@ class Ex2VecExtendedDouble(BaseModel):
 
         self.force = torch.nn.Parameter(torch.tensor(1.0))
 
-        # check if there is a pretrained weight passed
-        pretrained_path = config.get('pretrained_embeddings_path', None)
+
         if pretrained_path:
             ids, embs = load_item_extension_from_parquet(pretrained_path)
 
