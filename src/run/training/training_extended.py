@@ -3,7 +3,7 @@ from tqdm import tqdm
 import os
 from torch.utils.tensorboard import SummaryWriter
 
-from src.run.utils import collate_skip_stack_fn
+from run.utils import collate_skip_stack_fn
 
 
 def train_epoch_extended(epoch_id, dataloader, model, optimizer, loss_fn, device='cpu', writer=None, verbose=True):

@@ -7,7 +7,7 @@ from torch.utils.tensorboard import SummaryWriter
 # from ..models.extended.model import Ex2VecExtended
 # from ..models.original.model import Ex2VecOriginal
 
-from src.run.utils import collate_skip_stack_fn, save_training_state, get_optimizer, get_metric
+from run.utils import collate_skip_stack_fn, save_training_state, get_optimizer, get_metric
 # from utils import collate_skip_stack_fn
 
 
