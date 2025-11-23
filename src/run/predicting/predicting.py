@@ -60,10 +60,10 @@ def predict(model, dataloader, device, verbose, top_k, output_path):
 
             # lets get the output
 
-            u = np.squeeze(user_id)[:, None]  # -> (B, 1)
-            i = np.squeeze(item_id)[:, None]  # -> (B, 1)
-            t = np.squeeze(ts)[:, None]  # -> (B, 1)
-            c = np.squeeze(predict_items)  # -> (B, top_k)
+            u = user_id.reshape(-1)[:, None]  # -> (B, 1)
+            i = item_id.reshape(-1)[:, None]  # -> (B, 1)
+            t = item_id.reshape(-1)[:, None]  # -> (B, 1)
+            c = predict_items
 
             data = np.concatenate([u, i, t, c], axis=1)
 
