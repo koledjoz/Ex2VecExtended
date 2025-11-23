@@ -69,7 +69,8 @@ class Ex2VecExtendedDatasetShared:
             'real_values': torch.tensor(true_vals),
             'history_items': torch.tensor(history_items),
             'timedeltas': torch.tensor(timedeltas),
-            'weights': torch.tensor(weights)
+            'weights': torch.tensor(weights),
+            'predict_ts': ts
         }
 
 

@@ -7,7 +7,7 @@ from data import check_dataset, get_available_datasets, get_dataset, init_datase
 # from training.training_original import prepare_training_original, train_model_original
 # from training.training_extended import prepare_training_extended, train_model_extended
 
-from training.training import prepare_training, train_model
+from run.training.training import prepare_training, train_model
 
 def main():
     parser = argparse.ArgumentParser(description='Trains an Ex2Vec model.')
