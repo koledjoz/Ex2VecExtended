@@ -70,7 +70,7 @@ class Ex2VecExtendedDatasetShared:
             'history_items': torch.tensor(history_items),
             'timedeltas': torch.tensor(timedeltas),
             'weights': torch.tensor(weights),
-            'predict_ts': ts
+            'predict_ts': torch.tensor(ts)
         }
 
 

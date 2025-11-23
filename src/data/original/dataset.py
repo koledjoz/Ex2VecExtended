@@ -103,7 +103,7 @@ class Ex2VecOriginalDatasetShared:
             'real_values': torch.tensor(true_vals),
             'timedeltas': torch.from_numpy(timedeltas),
             'weights': torch.from_numpy(weights.astype(np.float32)),
-            'predict_ts': ts
+            'predict_ts': torch.tensor(ts)
         }
 
 
