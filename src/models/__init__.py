@@ -1,11 +1,16 @@
 from .original.model import Ex2VecOriginal
 from .extended.model import Ex2VecExtended
 from .extendedDouble.model import Ex2VecExtendedDouble
+from .BLproxy.model import BLProxy
+from .knn.model import KNNModelBase, KNNModelBL
 
 MODEL_REGISTRY = {
     "original": Ex2VecOriginal,
     "extended": Ex2VecExtended,
-    "extendeddouble": Ex2VecExtendedDouble
+    "extendeddouble": Ex2VecExtendedDouble,
+    "bl_proxy": BLProxy,
+    "knnBase": KNNModelBase,
+    "knnBL": KNNModelBL
 }
 
 

@@ -4,13 +4,19 @@ from .extended.dataset import Ex2VecExtendedDatasetWrap, Ex2VecExtendedDatasetSh
 DATASET_REGISTRY = {
     "original": Ex2VecOriginalDatasetWrap,
     "extended": Ex2VecExtendedDatasetWrap,
-    "extendeddouble": Ex2VecExtendedDatasetWrap
+    "extendeddouble": Ex2VecExtendedDatasetWrap,
+    "bl_proxy": Ex2VecOriginalDatasetWrap,
+    "knnBase": Ex2VecExtendedDatasetWrap,
+    "knnBL": Ex2VecExtendedDatasetWrap
 }
 
 DATASET_INIT_REGISTRY = {
     "original": Ex2VecOriginalDatasetShared,
     "extended": Ex2VecExtendedDatasetShared,
-    "extendeddouble": Ex2VecExtendedDatasetShared
+    "extendeddouble": Ex2VecExtendedDatasetShared,
+    "bl_proxy": Ex2VecOriginalDatasetShared,
+    "knnBase": Ex2VecExtendedDatasetWrap,
+    "knnBL": Ex2VecExtendedDatasetWrap
 }
 
 GROUP_TO_NAME = {}
