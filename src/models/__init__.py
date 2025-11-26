@@ -23,7 +23,7 @@ def load_model(config, checkpoint=None):
 
 def get_model(config):
     try:
-        return MODEL_REGISTRY[config['model_type'].lower()](config)
+        return MODEL_REGISTRY[config['model_type']](config)
     except KeyError:
         raise ValueError(f"Probably unknown model: {config['model_type']}. "
                          f"Available models: {list(MODEL_REGISTRY.keys())}. "
