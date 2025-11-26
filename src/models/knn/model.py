@@ -44,9 +44,9 @@ class KNNModelBase(BaseModel):
                 if str(item_id) not in mapping:
                     continue
                 mapped_id = mapping[str(item_id)]
-                self.embedding_item_extension.weight[mapped_id] = embs[i]
+                self.embedding_item.weight[mapped_id] = embs[i]
 
-        self.embedding_item_extension.weight.requires_grad_(False)
+        self.embedding_item.weight.requires_grad_(False)
 
     def forward(self, pred_item_indices, history_items_indices, history_weights):
         hist_item_emb = self.embedding_item(history_items_indices)
@@ -97,9 +97,9 @@ class KNNModelBL(BaseModel):
                 if str(item_id) not in mapping:
                     continue
                 mapped_id = mapping[str(item_id)]
-                self.embedding_item_extension.weight[mapped_id] = embs[i]
+                self.embedding_item.weight[mapped_id] = embs[i]
 
-        self.embedding_item_extension.weight.requires_grad_(False)
+        self.embedding_item.weight.requires_grad_(False)
 
     def forward(self, pred_item_indices, history_items_indices, history_timedeltas, history_weights):
         timedeltas = torch.log(torch.pow(torch.clamp(history_timedeltas, min=1e-6), -0.5))
