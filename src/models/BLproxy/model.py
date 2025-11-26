@@ -4,6 +4,7 @@ from ..base_model import BaseModel
 
 class BLProxy(BaseModel):
     def __init__(self, config):
+        super(BLProxy, self).__init__()
         self.config = config
 
     def forward(self, timedeltas, weights):
