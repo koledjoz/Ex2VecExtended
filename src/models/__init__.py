@@ -31,7 +31,7 @@ def get_model(config):
 
 
 def check_model(config):
-    return config['model_type'].lower() in MODEL_REGISTRY
+    return config['model_type'] in MODEL_REGISTRY
 
 
 def get_available_models():

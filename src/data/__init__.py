@@ -38,7 +38,7 @@ def get_dataset(group_id):
 
 
 def check_dataset(config):
-    return config['dataset_type'].lower() in DATASET_INIT_REGISTRY
+    return config['dataset_type'] in DATASET_INIT_REGISTRY
 
 
 def get_available_datasets():
