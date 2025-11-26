@@ -15,7 +15,7 @@ def main():
 
     parser.add_argument('--config_data', type=str, required=True, help='Path to the data config file.')
     parser.add_argument('--config_model', type=str, required=True, help='Path to the model config file.')
-    parser.add_argument('--checkpoint_load', type=str, required=True,
+    parser.add_argument('--checkpoint_load', type=str, required=False,
                         help='The path to a checkpoint of the model to be used for predictions.')
     parser.add_argument('--save_path', type=str, required=True, help='The path to the file where the predictions should '
                                                                     'be saved')
