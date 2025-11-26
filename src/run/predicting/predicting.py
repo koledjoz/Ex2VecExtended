@@ -10,7 +10,6 @@ from ..utils import collate_skip_stack_fn
 
 
 def prepare_predict(model, checkpoint, data, output_path, run_config, top_k):
-    model.load_state_dict(checkpoint['model_state_dict'])
     dataloader = torch.utils.data.DataLoader(data, batch_size=run_config['batch_size'],
                                              num_workers=run_config['num_workers'], shuffle=run_config['shuffle'],
                                              collate_fn=collate_skip_stack_fn)
