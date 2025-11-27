@@ -102,15 +102,16 @@ class KNNModelBL(BaseModel):
         self.embedding_item.weight.requires_grad_(False)
 
     def forward(self, pred_item_indices, history_items_indices, history_timedeltas, history_weights):
-        timedeltas = torch.log(torch.pow(torch.clamp(history_timedeltas, min=1e-6), -0.5))
-        timedeltas = timedeltas * history_weights.unsqueeze(2)
+        timedeltas = torch.pow(torch.clamp(history_timedeltas, min=1e-6), -0.5)
+        timedeltas = timedeltas * history_weights
 
 
         hist_item_emb = self.embedding_item(history_items_indices)
-        hist_item_emb = hist_item_emb * timedeltas
+
+        hist_item_emb = hist_item_emb * timedeltas.unsqueeze(2)
         sum_emb = hist_item_emb.sum(dim=1)  # (batch, d)
         count = timedeltas.sum(dim=1).clamp(min=1e-8)
-        user_emb = sum_emb / count
+        user_emb = sum_emb / count.unsqueeze(1)
 
         pred_item_emb = self.embedding_item(pred_item_indices)
 
