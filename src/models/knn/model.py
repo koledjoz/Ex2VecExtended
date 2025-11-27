@@ -50,8 +50,8 @@ class KNNModelBase(BaseModel):
 
     def forward(self, pred_item_indices, history_items_indices, history_weights):
         hist_item_emb = self.embedding_item(history_items_indices)
-        hist_item_emb = hist_item_emb * history_weights
-        sum_emb = hist_item_emb.sum(dim=1)  # (batch, d)
+        hist_item_emb = hist_item_emb * history_weights.unsqueeze(2)
+        sum_emb = hist_item_emb.sum(dim=1)
         count = hist_item_emb.sum(dim=1).clamp(min=1e-8)
         user_emb = sum_emb / count
 
@@ -103,7 +103,7 @@ class KNNModelBL(BaseModel):
 
     def forward(self, pred_item_indices, history_items_indices, history_timedeltas, history_weights):
         timedeltas = torch.log(torch.pow(torch.clamp(history_timedeltas, min=1e-6), -0.5))
-        timedeltas = timedeltas * history_weights
+        timedeltas = timedeltas * history_weights.unsqueeze(2)
 
 
         hist_item_emb = self.embedding_item(history_items_indices)
