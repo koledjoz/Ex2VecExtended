@@ -53,7 +53,7 @@ class KNNModelBase(BaseModel):
         hist_item_emb = hist_item_emb * history_weights.unsqueeze(2)
         sum_emb = hist_item_emb.sum(dim=1)
         count = history_weights.sum(dim=1).clamp(min=1e-8)
-        user_emb = sum_emb / count
+        user_emb = sum_emb / count.unsqueeze(1)
 
         pred_item_emb = self.embedding_item(pred_item_indices)
 
