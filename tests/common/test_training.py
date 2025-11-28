@@ -4,7 +4,7 @@ import copy
 import math
 
 
-from training.training import prepare_training, train_epoch, eval_epoch, train_model
+from run.training.training import prepare_training, train_epoch, eval_epoch, train_model
 from models import get_available_models
 from ..utils import deep_update, assert_dicts_close
 

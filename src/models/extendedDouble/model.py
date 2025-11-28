@@ -103,7 +103,7 @@ class Ex2VecExtendedDouble(BaseModel):
         weight = self.logistic(self.smooth / (1 + dist) - self.force * self.smooth) / self.logistic(
             self.smooth - self.force * self.smooth)
 
-        dist = dist * weight
+        dist = 1 / (1 + dist) * weight
 
         # dist = self.logistic(self.smooth / (1 + dist) - self.force * self.smooth) / self.logistic(
         #     self.smooth - self.force * self.smooth)

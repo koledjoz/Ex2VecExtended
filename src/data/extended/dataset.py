@@ -33,20 +33,19 @@ class Ex2VecExtendedDatasetShared:
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, idx):
-        pred_user_id = self.data.iloc[idx]['user_id']
-        pred_item = self.data.iloc[idx]['track_id']
 
-        if pred_item not in self.use_dict[pred_user_id]:
-            return None
-
+    def _get_data(self, pred_user_id, pred_item, ts):
         pred_items = np.append(np.array(sample_excluding(self.max_item, self.sample_negative, pred_item)), pred_item)
         true_vals = np.append(np.array([0.0 for _ in range(len(pred_items) - 1)]), 1.0)
 
-        history = self.data.iloc[max(idx - self.history_size, 0):idx]
+        # history is everything before a certain point
+        history = self.data[self.data['ts'] < ts]
         history = history[history['user_id'] == pred_user_id]
+        history = history.iloc[max(len(history) - self.history_size, 0):]
 
-        ts = self.data.iloc[idx]['ts']
+        # history = self.data.iloc[max(idx - self.history_size, 0):idx]
+
+
         timedeltas = (ts - history['ts']).to_numpy()
 
         history_items = history['track_id'].to_numpy()
@@ -56,7 +55,6 @@ class Ex2VecExtendedDatasetShared:
         timedeltas = timedeltas[:self.max_padding]
         history_items = history_items[:self.max_padding]
         weights = weights[:self.max_padding]
-
 
         timedeltas = np.pad(timedeltas, (0, self.max_padding - len(timedeltas)), mode='constant', constant_values=0)
         history_items = np.pad(history_items, (0, self.max_padding - len(history_items)), mode='constant',
@@ -72,6 +70,17 @@ class Ex2VecExtendedDatasetShared:
             'weights': torch.tensor(weights),
             'predict_ts': torch.tensor(ts)
         }
+
+    def __getitem__(self, idx):
+        pred_user_id = self.data.iloc[idx]['user_id']
+        pred_item = self.data.iloc[idx]['track_id']
+        ts = self.data.iloc[idx]['ts']
+
+        if pred_item not in self.use_dict[pred_user_id]:
+            return None
+
+        return self._get_data(pred_user_id, pred_item, ts)
+
 
 
 class Ex2VecExtendedDatasetWrap(torch.utils.data.Dataset):

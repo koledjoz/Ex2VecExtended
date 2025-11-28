@@ -49,14 +49,8 @@ class Ex2VecOriginalDatasetShared:
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, idx):
-        user = self.data.iloc[idx]['user_id']
-        pred_item = self.data.iloc[idx]['track_id']
-        ts = self.data.iloc[idx]['ts']
 
-        if pred_item not in self.use_dict[user]:
-            return None
-
+    def _get_data(self, user, pred_item, ts):
         if self.sample_negative != -1:
             true_vals = np.zeros(self.sample_negative + 1, dtype=np.float32)
             samples = np.empty(self.sample_negative + 1, dtype=np.int32)
@@ -105,6 +99,18 @@ class Ex2VecOriginalDatasetShared:
             'weights': torch.from_numpy(weights.astype(np.float32)),
             'predict_ts': torch.tensor(ts)
         }
+
+    def __getitem__(self, idx):
+        user = self.data.iloc[idx]['user_id']
+        pred_item = self.data.iloc[idx]['track_id']
+        ts = self.data.iloc[idx]['ts']
+
+        if pred_item not in self.use_dict[user]:
+            return None
+
+        return self._get_data(user, pred_item, ts)
+
+
 
 
 class Ex2VecOriginalDatasetWrap(torch.utils.data.Dataset):

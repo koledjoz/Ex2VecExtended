@@ -4,7 +4,7 @@ import os
 import torch
 
 from ..utils import assert_dicts_close
-from training.training import prepare_training, train_epoch, save_training_state
+from run.training.training import prepare_training, train_epoch, save_training_state
 from utils import load_checkpoint
 from models import get_available_models
 

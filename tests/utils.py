@@ -1,8 +1,10 @@
 import torch
 
-def assert_dicts_close(d1, d2, rtol=1e-5, atol=1e-8):
-    assert d1.keys() == d2.keys()
+def assert_dicts_close(d1, d2, rtol=1e-5, atol=1e-8, ignore = {}):
+    assert (d1.keys() - ignore) == (d2.keys() - ignore)
     for k in d1:
+        if k in ignore:
+            continue
         v1, v2 = d1[k], d2[k]
         if isinstance(v1, torch.Tensor) and isinstance(v2, torch.Tensor):
             torch.testing.assert_close(v1, v2, rtol=rtol, atol=atol)

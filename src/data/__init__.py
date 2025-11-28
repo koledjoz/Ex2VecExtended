@@ -15,8 +15,8 @@ DATASET_INIT_REGISTRY = {
     "extended": Ex2VecExtendedDatasetShared,
     "extendeddouble": Ex2VecExtendedDatasetShared,
     "bl_proxy": Ex2VecOriginalDatasetShared,
-    "knnBase": Ex2VecExtendedDatasetWrap,
-    "knnBL": Ex2VecExtendedDatasetWrap
+    "knnBase": Ex2VecExtendedDatasetShared,
+    "knnBL": Ex2VecExtendedDatasetShared
 }
 
 GROUP_TO_NAME = {}

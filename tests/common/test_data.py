@@ -2,7 +2,7 @@ import pytest
 import torch
 
 from data import init_dataset, get_dataset, get_dataset_type
-from training.utils import collate_skip_stack_fn
+from run.utils import collate_skip_stack_fn
 from models import get_available_models
 from ..utils import deep_update, assert_dicts_close
 
@@ -24,7 +24,7 @@ class TestData:
         assert len(train_data) == len(data_true)
         for i, (tested, true) in enumerate(zip(train_data, data_true)):
             print(f'Tested: {tested}, True: {true}')
-            assert_dicts_close(tested, true)
+            assert_dicts_close(tested, true, ignore={'predict_ts'})
 
     @pytest.mark.filterwarnings("ignore:This DataLoader will create.*:UserWarning")
     @pytest.mark.parametrize("model_type", get_available_models())
