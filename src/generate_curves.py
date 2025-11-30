@@ -46,12 +46,9 @@ def main():
 
     checkpoint = load_checkpoint(args.checkpoint_load)
 
-    dataset_config['dataset_type'] = 'ExtendedAnalysis'
-    dataset_config['sample_negative'] = 1
 
     init_dataset('test', dataset_config)
 
-    # data =
 
     data = get_dataset('test')
 
@@ -62,8 +59,6 @@ def main():
     if 'n_items' not in model_config:
         raise ValueError('Model config needs to specify the number of items.')
 
-    run_config['batch_size'] = 2
-    run_config['num_workers'] = 8
 
 
     model = load_model(model_config, checkpoint=checkpoint)
@@ -72,9 +67,6 @@ def main():
 
     generate_curves(**gen_curve_args)
 
-# parser.add_argument('--start_time', type=int, default=1654041600)
-#     parser.add_argument('--end_time', type=int, default=1661990376)
-#     parser.add_argument('--n_steps', type=int, default=500)
 
 if __name__ == "__main__":
     main()

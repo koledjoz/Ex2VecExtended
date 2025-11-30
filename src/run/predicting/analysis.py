@@ -71,9 +71,8 @@ def generate_curves(model, dataloader, device, verbose, output_path):
 
     with torch.no_grad():
         for i, batch in pbar:
-            # if batch is None:
-            #     pbar.update(1)
-            #     continue
+            if batch is None:
+                continue
             output = model.forward_batch(batch, device)
             score = output[:, -1].cpu().numpy()[:, None]
             prob = torch.nn.Softmax(dim=1)(output)[:, -1].cpu().numpy()[:, None]
