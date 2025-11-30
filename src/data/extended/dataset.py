@@ -91,6 +91,15 @@ class Ex2VecExtendedDatasetSharedForAnalysis:
         self.max_user = self.data['user_id'].max()
         self.max_item = self.data['track_id'].max()
 
+        self.range_dict = {}
+
+        for u in tqdm(self.data['user_id'].unique()):
+            mask = self.data['user_id'] == u
+
+            first_index = mask.idxmax()  # first True value
+            last_index = mask[::-1].idxmax()
+            self.range_dict[u] = (first_index, last_index)
+
     def get_n_users(self):
         return self.max_user
 
@@ -106,8 +115,10 @@ class Ex2VecExtendedDatasetSharedForAnalysis:
         true_vals = np.append(np.array([0.0 for _ in range(len(pred_items) - 1)]), 1.0)
 
         # history is everything before a certain point
-        history = self.data[self.data['ts'] < ts]
-        history = history[history['user_id'] == pred_user_id]
+        b, e = self.range_dict[pred_user_id]
+        history = self.data.loc[b:e]
+        history = history[history['ts'] < ts]
+        # history = history[history['user_id'] == pred_user_id]
         history = history.iloc[max(len(history) - self.history_size, 0):]
 
         # history = self.data.iloc[max(idx - self.history_size, 0):idx]

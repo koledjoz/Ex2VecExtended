@@ -1,5 +1,5 @@
 from .original.dataset import Ex2VecOriginalDatasetWrap, Ex2VecOriginalDatasetShared
-from .extended.dataset import Ex2VecExtendedDatasetWrap, Ex2VecExtendedDatasetShared
+from .extended.dataset import Ex2VecExtendedDatasetWrap, Ex2VecExtendedDatasetShared, Ex2VecExtendedDatasetSharedForAnalysis
 
 DATASET_REGISTRY = {
     "original": Ex2VecOriginalDatasetWrap,
@@ -7,7 +7,8 @@ DATASET_REGISTRY = {
     "extendeddouble": Ex2VecExtendedDatasetWrap,
     "bl_proxy": Ex2VecOriginalDatasetWrap,
     "knnBase": Ex2VecExtendedDatasetWrap,
-    "knnBL": Ex2VecExtendedDatasetWrap
+    "knnBL": Ex2VecExtendedDatasetWrap,
+
 }
 
 DATASET_INIT_REGISTRY = {
@@ -16,7 +17,8 @@ DATASET_INIT_REGISTRY = {
     "extendeddouble": Ex2VecExtendedDatasetShared,
     "bl_proxy": Ex2VecOriginalDatasetShared,
     "knnBase": Ex2VecExtendedDatasetShared,
-    "knnBL": Ex2VecExtendedDatasetShared
+    "knnBL": Ex2VecExtendedDatasetShared,
+    'ExtendedAnalysis': Ex2VecExtendedDatasetSharedForAnalysis
 }
 
 GROUP_TO_NAME = {}
@@ -34,7 +36,8 @@ def get_dataset(group_id):
     if group_id not in GLOBAL_SHARED_DATA:
         raise KeyError(f'No dataset found in group {group_id} in the GLOBAL_SHARED_DATA. Please initialize a dataset '
                        f'for this group first.')
-    return DATASET_REGISTRY[GROUP_TO_NAME[group_id]](GLOBAL_SHARED_DATA[group_id])
+    return GLOBAL_SHARED_DATA[group_id]
+    # return DATASET_REGISTRY[GROUP_TO_NAME[group_id]](GLOBAL_SHARED_DATA[group_id])
 
 
 def check_dataset(config):
