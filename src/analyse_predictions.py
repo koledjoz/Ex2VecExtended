@@ -45,7 +45,7 @@ def main():
     input_dir = args.predictions_path
     output_dir = args.output_path
 
-    df_full = pd.read_csv(args.full_data)
+    df_full = pd.read_parquet(args.full_data)
     item_counts = df_full['track_id'].value_counts().rename_axis('track_id').reset_index(name='total_count')
 
     model_dirs = os.listdir(input_dir)
