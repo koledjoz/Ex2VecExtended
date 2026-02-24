@@ -127,11 +127,11 @@ class Ex2VecExtendedWithEmbFast(BaseModel):
                 self.user_lamb(prediction_users).clamp_min(0.001))  # [B]
 
         # ---- base distance and output ----
-        base_dist = (dist_matrix - lamb[:, None] * bl_activation).clamp_min_(0)  # [B, I]
+        base_dist = (dist_matrix - lamb * bl_activation).clamp_min_(0)  # [B, I]
 
         # biases
-        user_b = self.user_bias(prediction_users)[None, :, :]  # [B, 1]
-        item_b = self.item_bias.weight.view(1, 1, -1)  # [1, I]
+        user_b = self.user_bias(prediction_users)  # [B, 1]
+        item_b = self.item_bias.weight.view(1, -1)  # [1, I]
 
         output = (self.alpha * base_dist +
                   self.beta.clamp_min(0.001) * (base_dist * base_dist) +
