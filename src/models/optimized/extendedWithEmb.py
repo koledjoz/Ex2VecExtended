@@ -59,8 +59,10 @@ class Ex2VecExtendedWithEmbFast(BaseModel):
                 mapped_id = mapping[str(item_id)]
                 self.embedding_item_extension.weight[mapped_id] = embs[i]
 
-        self.item_dist_matrix = torch.cdist(self.embedding_item_extension.weight, self.embedding_item_extension.weight).to('cuda')
-
+        # self.item_dist_matrix = torch.cdist(self.embedding_item_extension.weight, self.embedding_item_extension.weight).to('cuda')
+        dist = torch.cdist(self.embedding_item_extension.weight,
+                           self.embedding_item_extension.weight)
+        self.register_buffer("item_dist_matrix", dist)
 
     def build_hist_len(self, pad_id=0):
         # Assumes padding is pad_id (0) and (ideally) padded at the end
