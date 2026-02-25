@@ -70,9 +70,10 @@ class Ex2VecExtendedWithEmbFast(BaseModel):
         self.register_buffer("hist_len", hist_len)
 
     def initialize_histories(self, history_items, history_times):
-        self.history_items = history_items
-        self.history_times = history_times
+        self.register_buffer("history_items", history_items)
+        self.register_buffer("history_times", history_times)
         self.build_hist_len()
+
 
     def forward(self, prediction_times, prediction_users):
         # ---- embeddings / distances ----
