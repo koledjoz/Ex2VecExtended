@@ -8,8 +8,6 @@ from ..extendedDouble.model import load_item_extension_from_parquet
 class Ex2VecExtendedWithEmbFast(BaseModel):
     def __init__(self, config):
         super(Ex2VecExtendedWithEmbFast, self).__init__()
-        self.history_times = None
-        self.history_items = None
         self.config = config
         self.n_users = config['n_users']
         self.n_items = config['n_items']
