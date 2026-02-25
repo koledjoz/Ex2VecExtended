@@ -57,10 +57,10 @@ class Ex2VecExtendedWithEmbFast(BaseModel):
                 mapped_id = mapping[str(item_id)]
                 self.embedding_item_extension.weight[mapped_id] = embs[i]
 
-        # self.item_dist_matrix = torch.cdist(self.embedding_item_extension.weight, self.embedding_item_extension.weight).to('cuda')
-        dist = torch.cdist(self.embedding_item_extension.weight,
-                           self.embedding_item_extension.weight)
-        self.register_buffer("item_dist_matrix", dist)
+            # self.item_dist_matrix = torch.cdist(self.embedding_item_extension.weight, self.embedding_item_extension.weight).to('cuda')
+            dist = torch.cdist(self.embedding_item_extension.weight,
+                               self.embedding_item_extension.weight)
+            self.register_buffer("item_dist_matrix", dist)
 
     def build_hist_len(self, pad_id=0):
         # Assumes padding is pad_id (0) and (ideally) padded at the end
@@ -92,10 +92,10 @@ class Ex2VecExtendedWithEmbFast(BaseModel):
 
         # ---- history lookups ----
         hist_items = self.history_items[prediction_users, :lmax]  # [B, H]
-        hist_times = self.history_times[prediction_users, :lmax]  # [B, H]
+        hist_times = self.history_times[prediction_users, :lmax].float()  # [B, H]
 
         # prediction_times -> [B, 1]
-        t = prediction_times
+        t = prediction_times.float()
         if t.dim() == 1:
             t = t[:, None]
         else:
