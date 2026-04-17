@@ -102,33 +102,54 @@ class Ex2VecOriginalFast(BaseModel):
         # ---- compute per-history contribution ----
         dt = t - hist_times  # [B, H]
         # only keep dt >= 0
-        dt_pos = dt.clamp_min_(0)  # in-place clamp
+        dt_pos = dt.clamp_min(0)  # in-place clamp
 
         # rsqrt(x) == x**-0.5 but faster and more stable
         # contrib: [B, H], zeroed where dt < 0
-        contrib = (dt_pos + self.cutoff).rsqrt_()  # in-place rsqrt
-        contrib = contrib * (dt >= 0).to(contrib.dtype)  # mask negatives to 0
+        contrib = (dt_pos + self.cutoff).rsqrt()  # in-place rsqrt
+        
+        contrib = contrib * (dt > 0).to(contrib.dtype)  # mask negatives to 0
 
+        # print(contrib)
+        # for x, y in zip(contrib[0], dt[0]):
+        #     print(x, ':', y)
+        
         # ---- accumulate to per-item activation via scatter_add ----
         B, H = hist_items.shape
         I = self.n_items + 1
 
+        # print('Hist items shape:', hist_items.shape)
+        # print('Contrib shape:', contrib.shape)
+
         bl_activation = contrib.new_zeros((B, I))  # [B, I]
         bl_activation.scatter_add_(dim=1, index=hist_items, src=contrib)
 
+        #print('='*100)
+        #print('Activation shape:', bl_activation.shape)
+        #print('Contrib shape', contrib.shape)
+        #print('timedeltas shape:', dt.shape)
+        #for x, y in zip(contrib[0], dt[0]):
+        #    print(x, ':', y)
+
+        #print('='*100)
+        #print('ACTIVATIONS FOR ITEMS')
+        #print('='*100)
+        #for x, y in zip(bl_activation[0], range(self.n_items+1)):
+        #    print(x, ':', y)
+
         # ---- lambda ----
-        lamb = (self.global_lamb.clamp_min(0.001) +
-                self.user_lamb(prediction_users).clamp_min(0.001))  # [B]
+        lamb = (self.global_lamb +
+                self.user_lamb(prediction_users)).clamp_min(0.001)  # [B]
 
         # ---- base distance and output ----
-        base_dist = (dist_matrix - lamb * bl_activation).clamp_min_(0)  # [B, I]
+        base_dist = (dist_matrix - lamb * bl_activation).clamp_min(0)  # [B, I]
 
         # biases
         user_b = self.user_bias(prediction_users)  # [B, 1]
         item_b = self.item_bias.weight.view(1, -1)  # [1, I]
 
         output = (self.alpha * base_dist +
-                  self.beta.clamp_min(0.001) * (base_dist * base_dist) +
+                  self.beta.clamp_max(-0.001) * (base_dist * base_dist) +
                   self.gamma + user_b + item_b)  # [B, I]
 
         # If you truly need [B, 1, I] like your original broadcasting suggested:

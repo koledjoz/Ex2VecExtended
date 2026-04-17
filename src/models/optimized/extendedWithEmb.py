@@ -56,6 +56,7 @@ class Ex2VecExtendedWithEmbFast(BaseModel):
                     continue
                 mapped_id = mapping[str(item_id)]
                 self.embedding_item_extension.weight[mapped_id] = embs[i]
+            self.embedding_item_extension.weight.requires_grad = False
 
             # self.item_dist_matrix = torch.cdist(self.embedding_item_extension.weight, self.embedding_item_extension.weight).to('cuda')
             dist = torch.cdist(self.embedding_item_extension.weight,
@@ -86,6 +87,8 @@ class Ex2VecExtendedWithEmbFast(BaseModel):
             self.smooth - self.force * self.smooth)
 
         item_weight_matrix = (1 / (1 + self.item_dist_matrix) * weight).clamp(0.0, 1.0)
+        item_weight_matrix[0, :] = 0
+        item_weight_matrix[:, 0] = 0
 
         lengths = self.hist_len[prediction_users]  # [B]
         lmax = int(lengths.max().item())
@@ -104,12 +107,12 @@ class Ex2VecExtendedWithEmbFast(BaseModel):
         # ---- compute per-history contribution ----
         dt = t - hist_times  # [B, H]
         # only keep dt >= 0
-        dt_pos = dt.clamp_min_(0)  # in-place clamp
+        dt_pos = dt.clamp_min(0)  # in-place clamp
 
         # rsqrt(x) == x**-0.5 but faster and more stable
         # contrib: [B, H], zeroed where dt < 0
-        contrib = (dt_pos + self.cutoff.clamp_min(0.001)).rsqrt_()  # in-place rsqrt
-        contrib = contrib * (dt >= 0).to(contrib.dtype)  # mask negatives to 0
+        contrib = (dt_pos + self.cutoff.clamp_min(0.001)).rsqrt()  # in-place rsqrt
+        contrib = contrib * (dt > 0).to(contrib.dtype)  # mask negatives to 0
 
 
 
@@ -118,24 +121,24 @@ class Ex2VecExtendedWithEmbFast(BaseModel):
         I = self.n_items + 1
 
         bl_activation = contrib.new_zeros((B, I))  # [B, I]
-        mask = hist_items != 0
-        bl_activation.scatter_add_(dim=1, index=hist_items, src=contrib * mask.to(contrib.dtype))
+        # mask = hist_items != 0
+        bl_activation.scatter_add_(dim=1, index=hist_items, src=contrib)
 
         bl_activation = bl_activation @ item_weight_matrix
 
         # ---- lambda ----
-        lamb = (self.global_lamb.clamp_min(0.001) +
-                self.user_lamb(prediction_users).clamp_min(0.001))  # [B]
+        lamb = (self.global_lamb +
+                self.user_lamb(prediction_users)).clamp_min(0.001)  # [B]
 
         # ---- base distance and output ----
-        base_dist = (dist_matrix - lamb * bl_activation).clamp_min_(0)  # [B, I]
+        base_dist = (dist_matrix - lamb * bl_activation).clamp_min(0)  # [B, I]
 
         # biases
         user_b = self.user_bias(prediction_users)  # [B, 1]
         item_b = self.item_bias.weight.view(1, -1)  # [1, I]
 
         output = (self.alpha * base_dist +
-                  self.beta.clamp_min(0.001) * (base_dist * base_dist) +
+                  self.beta.clamp_max(-0.001) * (base_dist * base_dist) +
                   self.gamma + user_b + item_b)  # [B, I]
 
         # If you truly need [B, 1, I] like your original broadcasting suggested:
